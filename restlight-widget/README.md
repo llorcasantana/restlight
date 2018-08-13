@@ -76,10 +76,10 @@ public final class WebService {
     });
 
     LruImageCache mLruImageCache = new LruImageCache();
-    mImageLoader = new ImageLoader(mRestlight.getRequestQueue(), mLruImageCache); 
+    mImageLoader = new ImageLoader(mRestlight.getQueue(), mLruImageCache); 
   }
   
-  public Restlight api() {
+  public Restlight restlight() {
     return mRestlight;
   }
 
