@@ -1,10 +1,7 @@
-<h2>
-  Restlight
-</h2>
+## Restlight
 
-<p>
-  Restlight es una librería <b>HTTP</b> para Android y Java, que facilita la creación de peticiones <b>HTTP</b> como: GET, POST, HEAD, OPTIONS, PUT, DELETE y TRACE; hacia servidores externos. <a href="https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar">Descargar .jar</a> o <a href="https://github.com/JesusBetaX/Restlight/tree/master/restlight/examples">Ver demo</a> 
-</p>
+Restlight es una librería **HTTP** para Android y Java, que facilita la creación de peticiones **HTTP** como: GET, POST, HEAD, OPTIONS, PUT, DELETE y TRACE; hacia servidores externos. [Descargar .jar](https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar) o [Ver demo](https://github.com/JesusBetaX/Restlight/tree/master/restlight/examples) 
+
 
 ```
 BasicHttpStack stack = new BasicHttpStack();
