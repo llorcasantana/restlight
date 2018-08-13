@@ -141,7 +141,7 @@ public final class WebService {
   public <T> Request<T> gsonRequest(final Class<T> classOf) {
     return new Request<T>() {
       @Override
-      public T parseNetworkResponse(Response response) throws Exception {
+      public T parseResponse(Response.Network<T> response) throws Exception {
         String json = new String(response.readByteArray(), getCharset());
         return gson.fromJson(json, classOf);
       }
