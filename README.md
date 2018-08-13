@@ -58,6 +58,20 @@ String run() throws Exception {
 }
 ```
 
+## DOWLOAD
+```
+File run() throws Exception {
+  String downloadPath = "C:\\Users\\Jesus\\Desktop\\restlight.jar";
+  Request<File> request = new DownloadRequest(downloadPath)
+          .setUrl("https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar")
+          .setMethod("GET");
+
+  try (Response.Network<File> net = stack.execute(request)) {
+    return request.parseResponse(net);
+  }
+}
+```
+
 ## UPLOAD
 ```
 String run() throws Exception { 
