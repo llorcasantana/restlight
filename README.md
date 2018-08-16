@@ -188,6 +188,7 @@ public class Dao {
 }
 ```
 
+Programa la solicitud para ser ejecutada en segundo plano.
 ```
 ...
 Dao dao = new Dao();
