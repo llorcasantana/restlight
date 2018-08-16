@@ -188,7 +188,7 @@ public class Dao {
 }
 ```
 
-Programa la solicitud para ser ejecutada en segundo plano.
+Programa la solicitud para ser ejecutada en segundo plano. Ideal para aplicaciones android. 
 ```
 ...
 Dao dao = new Dao();
