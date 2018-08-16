@@ -1,13 +1,15 @@
 ## Restlight
 
-Restlight es una librería **HTTP** para Android y Java, que facilita la creación de peticiones **HTTP** como: GET, POST, HEAD, OPTIONS, PUT, DELETE y TRACE; hacia servidores externos. [Descargar .jar](https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar) o [Ver demo](https://github.com/JesusBetaX/Restlight/tree/master/restlight/examples) 
+Restlight es una librería **HTTP** para Android y Java, que facilita la creación de peticiones **HTTP** como: GET, POST, HEAD, OPTIONS, PUT, DELETE y TRACE; hacia servidores externos. [Descargar .jar](https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar) o [Ver demo](https://github.com/JesusBetaX/restlight/tree/master/restlight/examples/src/com/jx) 
 
+## Ejemplos
 
+Creamos un objeto para ejecutar las request.  
 ```
 BasicHttpStack stack = new BasicHttpStack();
 ```
 
-## GET
+### GET
 ```
 String run() throws Exception {
   String url = "http://weather.livedoor.com/forecast/webservice/json/v1?city=130010";
@@ -21,7 +23,7 @@ String run() throws Exception {
 }
 ```
 
-## POST
+### POST
 ```
 String run() throws Exception {
   FormBody body = new FormBody()
@@ -40,7 +42,7 @@ String run() throws Exception {
 }
 ```
 
-## DELETE
+### DELETE
 ```
 String run() throws Exception {
   String url = new HttpUrl()
@@ -58,7 +60,7 @@ String run() throws Exception {
 }
 ```
 
-## DOWLOAD
+### DOWLOAD
 ```
 File run() throws Exception {
   String downloadPath = "C:\\Users\\Jesus\\Desktop\\restlight.jar";
@@ -72,7 +74,7 @@ File run() throws Exception {
 }
 ```
 
-## UPLOAD
+### UPLOAD
 ```
 String run() throws Exception { 
   MultipartBody body = new MultipartBody()
