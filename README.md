@@ -5,6 +5,7 @@ Restlight es una librería **HTTP** para Android y Java, que facilita la creaci�
 ## Ejemplos
 
 Creamos un objeto para ejecutar las request.  
+Envíe sincrónicamente la solicitud y devuelva su respuesta.
 ```
 BasicHttpStack stack = new BasicHttpStack();
 ```
@@ -189,6 +190,7 @@ public class Dao {
 ```
 
 Programa la solicitud para ser ejecutada en segundo plano. Ideal para aplicaciones android. 
+Envía de manera asíncrona la petición y notifica a tu aplicación con un callback cuando una respuesta regresa.
 ```
 ...
 Dao dao = new Dao();
