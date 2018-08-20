@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import restlight.io.IOUtils;
 
-public class MultipartBody extends RequestBody {
+public class MultipartBody implements RequestBody {
   /** Espacio colon */
   public static final byte[] COLON_SPACE = {':', ' '};
   

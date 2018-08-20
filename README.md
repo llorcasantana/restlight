@@ -139,12 +139,7 @@ public final class WebService {
   private final Restlight restlight;
   
   private WebService() {
-    restlight = new Restlight(new Executor() {
-      final Handler handler = new Handler(Looper.getMainLooper());
-      @Override public void execute(Runnable r) {
-        handler.post(r);
-      }
-    });
+    restlight = new Restlight(new AndroidExecutor());
   }
   
   public static WebService getInstance() {

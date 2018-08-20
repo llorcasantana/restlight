@@ -2,15 +2,16 @@ package com.jx.library;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.concurrent.Executor;
-import restlight.BasicHttpStack;
+//import com.squareup.okhttp.OkHttpClient;
+//import java.io.IOException;
+//import java.net.HttpURLConnection;
+//import java.net.URL;
+//import java.util.concurrent.Executor;
+//import restlight.BasicHttpStack;
 import restlight.Request;
 import restlight.Response;
 import restlight.Restlight;
+import restlight.platform.JavaSwingExecutor;
 
 public final class WebService {
 
@@ -24,20 +25,15 @@ public final class WebService {
   
   private WebService() {
     // Advertencia: Solo se debe crear una sola instancia de esta clase.
-    restlight = new Restlight(new Executor() {
-      @Override
-      public void execute(Runnable r) {
-        java.awt.EventQueue.invokeLater(r);
-      }
-    });
+    restlight = new Restlight(new JavaSwingExecutor());
 
-    restlight.setHttpStack(new BasicHttpStack() {
-      final OkHttpClient client = new OkHttpClient();
-      @Override
-      public HttpURLConnection open(URL src) throws IOException {
-        return client.open(src);
-      }
-    });
+//    restlight.setHttpStack(new BasicHttpStack() {
+//      final OkHttpClient client = new OkHttpClient();
+//      @Override
+//      public HttpURLConnection open(URL src) throws IOException {
+//        return client.open(src);
+//      }
+//    });
   }
   
   public <T> Request<T> gsonRequest(final Class<T> classOf) {
