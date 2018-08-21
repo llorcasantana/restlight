@@ -58,6 +58,7 @@ import android.os.Looper;
 import restlight.Restlight;
 import restlight.widget.ImageLoader;
 import restlight.widget.LruImageCache;
+import restlight.platform.AndroidExecutor;
 
 public final class WebService {
 
@@ -67,13 +68,7 @@ public final class WebService {
   pricate final ImageLoader mImageLoader; 
   
   private WebService() {  
-    mRestlight = new Restlight(new Executor() {
-      final Handler handler = new Handler(Looper.getMainLooper());
-      @Override
-      public void execute(Runnable r) {
-        handler.post(r);
-      }
-    });
+    mRestlight = new Restlight(new AndroidExecutor());
 
     LruImageCache mLruImageCache = new LruImageCache();
     mImageLoader = new ImageLoader(mRestlight.getQueue(), mLruImageCache); 
