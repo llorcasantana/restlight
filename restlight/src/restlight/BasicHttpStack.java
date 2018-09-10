@@ -40,7 +40,7 @@ public class BasicHttpStack implements HttpStack {
   }
   
   /**
-   * Abre una conexión HTTP a intenert apartir de una petición.
+   * Abre una conexión HTTP a intenert apartir de un recurso URL.
    *
    * @param src recurso de conección.
    *
@@ -114,11 +114,11 @@ public class BasicHttpStack implements HttpStack {
   }
 
   /**
-   * Metodo que se encargar de eviar los datos a internet por medio de una
-   * escritura de streams.
+   * Metodo que se encargar de eviar los datos de la petición a internet por 
+   * medio de una escritura de streams.
    *
    * @param conn conexión abierta a internet
-   * @param request peticion
+   * @param request peticion a inyectar
    *
    * @throws java.io.IOException
    */
