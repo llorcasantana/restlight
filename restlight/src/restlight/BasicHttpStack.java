@@ -8,7 +8,7 @@ import restlight.io.IOUtils;
 
 public class BasicHttpStack implements HttpStack {   
   /**
-   * Ejecuta una petición.
+   * Ejecuta una petición a internet.
    *
    * @param request petición a ejecutar
    *
@@ -42,7 +42,7 @@ public class BasicHttpStack implements HttpStack {
   /**
    * Abre una conexión HTTP a intenert apartir de una petición.
    *
-   * @param src conección.
+   * @param src recurso de conección.
    *
    * @return una conexión HTTP abierta.
    *
