@@ -45,10 +45,19 @@ public class MultipartBody implements RequestBody {
     return boundary;
   }
   
+  /**
+   * Devuelve el encabezado Content-Type para este cuerpo.
+   * @param charset codificación para este cuerpo.
+   */
   @Override public String contentType(Charset charset) {
     return "multipart/form-data; boundary=" + boundary;
   }
   
+  /**
+   * Devuelve la cantidad de bytes que se escribirán para hundirse en una 
+   * llamada a {@link #writeTo(java.io.OutputStream, java.nio.charset.Charset) }
+   * @param charset codificación para este cuerpo.
+   */
   @Override public long contentLength(Charset charset) throws IOException {
     long len = 0;
     for (int i = 0; i < parts.size(); i++) {
@@ -65,6 +74,11 @@ public class MultipartBody implements RequestBody {
     }
   }
 
+  /**
+   * Escribe el contenido de esta solicitud para hundirse.
+   * @param out flujo de streams
+   * @param chrst codificación para este cuerpo.
+   */
   @Override public void writeTo(OutputStream out, Charset charset) throws IOException {
     doWrite(out, charset, Boolean.TRUE);
   }
@@ -93,16 +107,27 @@ public class MultipartBody implements RequestBody {
     out.write(CR_LF);
   }
 
+  /** Agrega un nuevo parámetro a este cuerpo. */
   public MultipartBody addPart(Part<?> bodyPart) {
     parts.add(bodyPart);
     return this;
   }
 
+  /**
+   * Agregue un parámetro de datos de formulario al cuerpo.
+   * @param name llave del parámetro
+   * @param value valor del parámetro
+   */
   public MultipartBody addParam(String name, Object value) {
     String newValue = value == null ? "" : value.toString();
     return addPart(new Part.StringPart(name, newValue));
   }
 
+  /**
+   * Agregue un parámetro de datos de formulario al cuerpo.
+   * @param name llave del parámetro
+   * @param value valor del parámetro
+   */
   public MultipartBody addFile(String name, File value) {
     return addPart(new Part.FilePart(name, value));
   }

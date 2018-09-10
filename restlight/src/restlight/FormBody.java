@@ -23,7 +23,6 @@ public class FormBody implements RequestBody {
 
   /**
    * Devuelve el encabezado Content-Type para este cuerpo.
-   * Solo se usa para peticiones POST o PUT.
    * @param charset codificación para este cuerpo.
    */
   @Override public String contentType(Charset charset) {
@@ -67,7 +66,7 @@ public class FormBody implements RequestBody {
   }
   
   /** 
-   * Agrega un parámetro a este cuerpo.
+   * Agrega un nuevo parámetro a este cuerpo.
    * @param key llave del parametro
    * @param value valor del parametro
    */
