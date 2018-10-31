@@ -29,7 +29,7 @@ public class Restlight {
   }
   
   public HttpStack getHttpStack() {
-    if (mStack == null)  mStack = new BasicHttpStack();
+    if (mStack == null) mStack = BasicHttpStack.getInstance();
     return mStack;
   }
 

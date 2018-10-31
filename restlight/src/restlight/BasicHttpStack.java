@@ -7,6 +7,13 @@ import java.net.URL;
 import restlight.io.IOUtils;
 
 public class BasicHttpStack implements HttpStack {   
+  private static BasicHttpStack instance;
+  
+  public static BasicHttpStack getInstance() {
+    if (instance == null) instance = new BasicHttpStack();
+    return instance;
+  }
+  
   /**
    * Ejecuta una petición a internet.
    *
