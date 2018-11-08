@@ -7,9 +7,13 @@ import android.os.Looper;
 import javax.swing.SwingUtilities;
 
 public class Platform implements Executor {
-  private static final Platform PLATFORM = findPlatform();
-    public static Platform get() {
-    return PLATFORM;
+  private static Platform platform;
+  public static Platform get() {
+    if (platform == null) platform = findPlatform();
+    return platform;
+  }
+  public static void set(Platform platform) {
+    Platform.platform = platform;
   }
     
   /** Attempt to match the host runtime to a capable Platform implementation. */
