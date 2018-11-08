@@ -2,11 +2,12 @@ package restlight;
 
 import java.util.concurrent.Executor;
 import restlight.io.IOUtils;
+import restlight.platform.Platform;
 
 public class Restlight {
 
 // TODO: Varibles...
- 
+  
   /** Procesara las peticiones a internet. */
   private HttpStack mStack;
   
@@ -18,8 +19,15 @@ public class Restlight {
  
 // TODO: Constructor...
   
+  private static Restlight instance;
+  
   public Restlight(Executor executor) {
     mExecutor = executor;
+  }
+  
+  public static Restlight getInstance() {
+    if (instance == null) instance = new Restlight(Platform.get());
+    return instance;
   }
 
 // TODO: Funciones...

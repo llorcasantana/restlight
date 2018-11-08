@@ -139,7 +139,7 @@ public final class WebService {
   private final Restlight restlight;
   
   private WebService() {
-    restlight = new Restlight(new AndroidExecutor());
+    restlight = Restlight.getInstance();
   }
   
   public static WebService getInstance() {

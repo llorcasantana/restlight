@@ -11,7 +11,6 @@ import com.google.gson.GsonBuilder;
 import restlight.Request;
 import restlight.Response;
 import restlight.Restlight;
-import restlight.platform.JavaSwingExecutor;
 
 public final class WebService {
 
@@ -24,8 +23,7 @@ public final class WebService {
         .create();
   
   private WebService() {
-    // Advertencia: Solo se debe crear una sola instancia de esta clase.
-    restlight = new Restlight(new JavaSwingExecutor());
+    restlight = Restlight.getInstance();
 
 //    restlight.setHttpStack(new BasicHttpStack() {
 //      final OkHttpClient client = new OkHttpClient();
