@@ -26,11 +26,6 @@ public class Platform implements Executor {
     } catch (ClassNotFoundException ignored) {
     }
     try {
-      Class.forName("javafx.application.Platform");
-      return new JavaFX();
-    } catch (ClassNotFoundException ignored) {
-    }
-    try {
       Class.forName("javax.swing.SwingUtilities");
       return new JavaSwing();
     } catch (ClassNotFoundException ignored) {
@@ -46,12 +41,6 @@ public class Platform implements Executor {
     final Handler handler = new Handler(Looper.getMainLooper());
     @Override public void execute(Runnable r) {
       handler.post(r);
-    }
-  }
-  
-  public static class JavaFX extends Platform {
-    @Override public void execute(Runnable r) {
-      javafx.application.Platform.runLater(r);
     }
   }
 
