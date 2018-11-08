@@ -1,5 +1,6 @@
 package restlight;
 
+import java.util.concurrent.Executor;
 import restlight.io.IOUtils;
 import restlight.platform.Platform;
 
@@ -10,9 +11,12 @@ public class Restlight {
   /** Procesara las peticiones a internet. */
   private HttpStack mStack;
   
+  /** Puente que comunica las tareas con el hilo principal. */
+  private Executor mExecutor;
+  
   /** Cola de peticiones al servidor. */
   private RequestQueue mQueue;
-
+  
 // TODO: Constructor...
   
   private static Restlight instance;
@@ -36,9 +40,18 @@ public class Restlight {
     mStack = httpStack;
   }
 
+  public Executor getExecutor() {
+    if (mExecutor == null) mExecutor = Platform.get();
+    return mExecutor;
+  }
+
+  public void setExecutor(Executor mExecutor) {
+    this.mExecutor = mExecutor;
+  }
+
   public RequestQueue getQueue() {
     if (mQueue == null) {
-      mQueue = new RequestQueue(getHttpStack(), Platform.get());
+      mQueue = new RequestQueue(getHttpStack(), getExecutor());
       mQueue.start();
     }
     return mQueue;
