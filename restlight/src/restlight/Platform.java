@@ -1,4 +1,4 @@
-package restlight.platform;
+package restlight;
 
 import java.util.concurrent.Executor;
 import android.os.Build;

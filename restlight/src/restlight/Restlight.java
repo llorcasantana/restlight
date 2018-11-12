@@ -2,7 +2,6 @@ package restlight;
 
 import java.util.concurrent.Executor;
 import restlight.io.IOUtils;
-import restlight.platform.Platform;
 
 public class Restlight {
 
@@ -38,6 +37,11 @@ public class Restlight {
 
   public void setHttpStack(HttpStack httpStack) {
     mStack = httpStack;
+    if (mQueue != null) {
+      if (mStack != mQueue.mNetwork) {
+        mQueue = new RequestQueue(mStack, mQueue.mExecutor, mQueue.mDispatchers);
+      }
+    }
   }
 
   public Executor getExecutor() {
@@ -45,8 +49,13 @@ public class Restlight {
     return mExecutor;
   }
 
-  public void setExecutor(Executor mExecutor) {
-    this.mExecutor = mExecutor;
+  public void setExecutor(Executor executor) {
+    mExecutor = executor;
+    if (mQueue != null) {
+      if (mExecutor != mQueue.mExecutor) {
+        mQueue = new RequestQueue(mQueue.mNetwork, mExecutor, mQueue.mDispatchers);
+      }
+    }
   }
 
   public RequestQueue getQueue() {
@@ -58,7 +67,10 @@ public class Restlight {
   }
 
   public void setQueue(RequestQueue queue) {
+    if (mQueue != null) mQueue.stop();
     mQueue = queue;
+    mStack = mQueue.mNetwork;
+    mExecutor = mQueue.mExecutor;
   }
 
   /**

@@ -26,24 +26,17 @@ public class RequestQueue {
   /** Hilo que atendera la cola. */
   final Thread[] mDispatchers;
 
-  /**
-   * @param network
-   * @param executor
-   */
-  public RequestQueue(HttpStack network, Executor executor) {
-    this(network, executor, DEFAULT_NETWORK_THREAD_POOL_SIZE);
-  }
-
-  /**
-   * @param network
-   * @param executor
-   * @param threadPoolSize
-   */
-  public RequestQueue(HttpStack network, Executor executor, int threadPoolSize) {
+  public RequestQueue(HttpStack network, Executor executor, Thread[] dispatchers) {
     mNetworkQueue = new LinkedBlockingQueue<Request<?>>();
     mNetwork = network;
     mExecutor = executor;
-    mDispatchers = new Thread[threadPoolSize];
+    mDispatchers = dispatchers;
+  }
+  public RequestQueue(HttpStack network, Executor executor, int threadPoolSize) {
+    this(network, executor, new Thread[threadPoolSize]);
+  }
+  public RequestQueue(HttpStack network, Executor executor) {
+    this(network, executor, DEFAULT_NETWORK_THREAD_POOL_SIZE);
   }
 
   /**
