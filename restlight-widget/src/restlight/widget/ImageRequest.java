@@ -65,15 +65,15 @@ public class ImageRequest extends Request<Bitmap> {
         return resized;
     }
 
-    public Bitmap parseResponse(Response.Network<Bitmap> response) throws Exception {
+    public Bitmap parseResponse(Response<Bitmap> response) throws Exception {
     	 // Serialize all decode on a global lock to reduce concurrent heap usage.
         synchronized (sDecodeLock) {
         	return doParse(response);
         }
     }
 
-    private Bitmap doParse(Response.Network<Bitmap> response) throws Exception {
-    	byte[] data = response.readByteArray();
+    private Bitmap doParse(Response<Bitmap> response) throws Exception {
+    	byte[] data = response.bytes();
         BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
         Bitmap bitmap = null;
         if (mMaxWidth == 0 && mMaxHeight == 0) {
