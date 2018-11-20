@@ -18,8 +18,8 @@ String run() throws Exception {
           .setUrl(url)
           .setMethod("GET");
 
-  try (Response.Network<String> net = stack.execute(request)) {
-    return request.parseResponse(net);
+  try (Response<String> response = stack.execute(request)) {
+    return request.parseResponse(response);
   }
 }
 ```
@@ -37,8 +37,8 @@ String run() throws Exception {
           .setMethod("POST")
           .setBody(body);
 
-  try (Response.Network<String> net = stack.execute(request)) {
-    return request.parseResponse(net);
+  try (Response<String> response = stack.execute(request)) {
+    return request.parseResponse(response);
   }
 }
 ```
@@ -55,8 +55,8 @@ String run() throws Exception {
           .setUrl(url)
           .setMethod("DELETE");
 
-  try (Response.Network<String> net = stack.execute(request)) {
-    return request.parseResponse(net);
+  try (Response<String> response = stack.execute(request)) {
+    return request.parseResponse(response);
   }
 }
 ```
@@ -69,8 +69,8 @@ File run() throws Exception {
           .setUrl("https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar")
           .setMethod("GET");
 
-  try (Response.Network<File> net = stack.execute(request)) {
-    return request.parseResponse(net);
+  try (Response<File> response = stack.execute(request)) {
+    return request.parseResponse(response);
   }
 }
 ```
@@ -87,8 +87,8 @@ String run() throws Exception {
           .setMethod("POST")
           .setBody(body);
 
-  try (Response.Network<String> net = stack.execute(request)) {
-    return request.parseResponse(net);
+  try (Response<String> response = stack.execute(request)) {
+    return request.parseResponse(response);
   }
 }
 ```
@@ -151,7 +151,7 @@ public final class WebService {
     return new Request<T>() {
       @Override
       public T parseResponse(Response.Network<T> response) throws Exception {
-        String json = new String(response.readByteArray(), getCharset());
+        String json = response.string(getCharset());
         return gson.fromJson(json, classOf);
       }
     };
