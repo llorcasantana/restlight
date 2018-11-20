@@ -52,9 +52,6 @@ Se recomienda que utilice un objeto ImageLoader común para su aplicación en fo
 ```
 import java.util.concurrent.Executor;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import restlight.Restlight;
 import restlight.widget.ImageLoader;
 import restlight.widget.LruImageCache;
@@ -67,16 +64,10 @@ public final class WebService {
   pricate final ImageLoader mImageLoader; 
   
   private WebService() {  
-    mRestlight = new Restlight(new Executor() {
-      final Handler handler = new Handler(Looper.getMainLooper());
-      @Override
-      public void execute(Runnable r) {
-        handler.post(r);
-      }
-    });
+    mRestlight = Restlight.getInstance();
 
     LruImageCache mLruImageCache = new LruImageCache();
-    mImageLoader = new ImageLoader(mRestlight.getRequestQueue(), mLruImageCache); 
+    mImageLoader = new ImageLoader(mRestlight.getQueue(), mLruImageCache); 
   }
   
   public Restlight api() {
