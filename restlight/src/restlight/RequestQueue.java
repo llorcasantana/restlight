@@ -34,7 +34,7 @@ public class RequestQueue {
   }
   public RequestQueue(HttpStack network, Executor executor, int threadPoolSize) {
     this(network, executor, new Thread[threadPoolSize]);
-  }
+  } 
   public RequestQueue(HttpStack network, Executor executor) {
     this(network, executor, DEFAULT_NETWORK_THREAD_POOL_SIZE);
   }

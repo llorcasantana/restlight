@@ -13,5 +13,5 @@ public interface HttpStack {
    *
    * @throws java.lang.Exception
    */
-  public <T> Response.Network<T> execute(Request<T> request) throws IOException;
+  public <T> Response<T> execute(Request<T> request) throws IOException;
 }

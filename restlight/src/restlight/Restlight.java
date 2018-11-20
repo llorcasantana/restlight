@@ -1,12 +1,12 @@
 package restlight;
 
 import java.util.concurrent.Executor;
-import restlight.io.IOUtils;
 
 public class Restlight {
 
 // TODO: Varibles...
-  
+  private static Restlight instance;
+ 
   /** Procesara las peticiones a internet. */
   private HttpStack mStack;
   
@@ -15,11 +15,9 @@ public class Restlight {
   
   /** Cola de peticiones al servidor. */
   private RequestQueue mQueue;
-  
+ 
 // TODO: Constructor...
-  
-  private static Restlight instance;
-  
+
   public Restlight() {
   }
   
@@ -30,49 +28,46 @@ public class Restlight {
 
 // TODO: Funciones...
   
-  public HttpStack getHttpStack() {
-    if (mStack == null) mStack = BasicHttpStack.getInstance();
+  public HttpStack getStack() {
+    if (mStack == null) setStack(new BasicHttpStack());
     return mStack;
   }
-
-  public void setHttpStack(HttpStack httpStack) {
-    mStack = httpStack;
+  public void setStack(HttpStack stack) {
+    mStack = stack;
     if (mQueue != null) {
-      if (mStack != mQueue.mNetwork) {
-        mQueue = new RequestQueue(mStack, mQueue.mExecutor, mQueue.mDispatchers);
+      if (stack != mQueue.mNetwork) {
+        mQueue = new RequestQueue(stack, mQueue.mExecutor, mQueue.mDispatchers);
       }
     }
   }
-
+  
   public Executor getExecutor() {
-    if (mExecutor == null) mExecutor = Platform.get();
+    if (mExecutor == null) setExecutor(Platform.get());
     return mExecutor;
   }
-
   public void setExecutor(Executor executor) {
     mExecutor = executor;
     if (mQueue != null) {
-      if (mExecutor != mQueue.mExecutor) {
-        mQueue = new RequestQueue(mQueue.mNetwork, mExecutor, mQueue.mDispatchers);
+      if (executor != mQueue.mExecutor) {
+        mQueue = new RequestQueue(mQueue.mNetwork, executor, mQueue.mDispatchers);
       }
     }
   }
-
+  
   public RequestQueue getQueue() {
     if (mQueue == null) {
-      mQueue = new RequestQueue(getHttpStack(), getExecutor());
+      mQueue = new RequestQueue(getStack(), getExecutor());
       mQueue.start();
     }
     return mQueue;
   }
-
   public void setQueue(RequestQueue queue) {
     if (mQueue != null) mQueue.stop();
     mQueue = queue;
     mStack = mQueue.mNetwork;
     mExecutor = mQueue.mExecutor;
   }
-
+  
   /**
    * Envía de manera asíncrona la petición y notifica a tu aplicación con un
    * callback cuando una respuesta regresa. Ya que esta petición es asíncrona,
@@ -93,13 +88,7 @@ public class Restlight {
    * servidor
    */
   public <T> Response<T> execute(Request<T> request) throws Exception {
-    Response.Network<T> response = null;
-    try {
-      response = getHttpStack().execute(request);
-      return response.response();
-    } finally {
-      IOUtils.closeQuietly(response);
-    }
+    return getStack().execute(request).parseResponse();
   }
   
   /**

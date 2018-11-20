@@ -1,18 +1,18 @@
 package restlight;
 
-import java.util.concurrent.Executor;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import java.util.concurrent.Executor;
 import javax.swing.SwingUtilities;
 
 public class Platform implements Executor {
   private static final Platform PLATFORM = findPlatform();
-  public static Platform get() {
+
+  static Platform get() {
     return PLATFORM;
   }
 
-  /** Attempt to match the host runtime to a capable Platform implementation. */
   private static Platform findPlatform() {
     try {
       Class.forName("android.os.Build");
@@ -28,21 +28,20 @@ public class Platform implements Executor {
     }
     return new Platform();
   }
-
-  @Override public void execute(Runnable r) {
-    r.run();
+  @Override public void execute(Runnable command) {
+    command.run();
   }
   
   public static class Android extends Platform {
-    final Handler handler = new Handler(Looper.getMainLooper());
-    @Override public void execute(Runnable r) {
-      handler.post(r);
+    final Handler mHandler = new Handler(Looper.getMainLooper());
+    @Override public void execute(Runnable command) {
+      mHandler.post(command);
     }
   }
-
+  
   public static class JavaSwing extends Platform {
-    @Override public void execute(Runnable r) {
-      SwingUtilities.invokeLater(r);
+    @Override public void execute(Runnable command) {
+      SwingUtilities.invokeLater(command);
     }
   }
 }

@@ -22,18 +22,13 @@ public class FormBody implements RequestBody {
   private final List<Object> values = new ArrayList<Object>();
 
   /**
-   * Devuelve el encabezado Content-Type para este cuerpo.
-   * @param charset codificación para este cuerpo.
+   * @param charset
+   * @return el tipo de contenido para POST o PUT.
    */
   @Override public String contentType(Charset charset) {
     return "application/x-www-form-urlencoded; charset=" + charset.name();
   }
   
-  /**
-   * Devuelve la cantidad de bytes que se escribirán para hundirse en una 
-   * llamada a {@link #writeTo(java.io.OutputStream, java.nio.charset.Charset) }
-   * @param charset codificación para este cuerpo.
-   */
   @Override public long contentLength(Charset charset) throws IOException {
     ByteArrayOutputStream baos = null;
     try {
@@ -45,11 +40,6 @@ public class FormBody implements RequestBody {
     }
   }
 
-  /**
-   * Escribe el contenido de esta solicitud para hundirse.
-   * @param out flujo de streams
-   * @param chrst codificación para este cuerpo.
-   */
   @Override public void writeTo(OutputStream out, Charset chrst) throws IOException {
     for (int i = 0, size = size(); i < size; i++) {
       if (i > 0) out.write('&');
@@ -60,28 +50,20 @@ public class FormBody implements RequestBody {
     }
   }
   
-  /** Devuelve la cantidad de parámetros de este cuerpo. */
   public int size() {
     return keys.size();
   }
   
-  /** 
-   * Agrega un nuevo parámetro a este cuerpo.
-   * @param key llave del parametro
-   * @param value valor del parametro
-   */
   public FormBody add(String key, Object value) {
     keys.add(key);
     values.add(value);
     return this;
   }
 
-  /** Devuelve la llave de un parámetro según su posición. */
   public String key(int index) {
     return keys.get(index);
   }
   
-  /** Devuelve el valor de un parámetro según su posición. */
   public Object value(int index) {
     return values.get(index);
   }

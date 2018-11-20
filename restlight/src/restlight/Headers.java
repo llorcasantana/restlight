@@ -20,33 +20,24 @@ public class Headers {
     namesAndValues = new ArrayList<String>(size * 2);
   }
   
-  /** Devuelve la cantidad de valores de campo. */
   public int size() {
     return namesAndValues.size() / 2;
   }
   
-  /**
-   * Agrega un nuevo parámetro
-   * @param key llave del parámetro
-   * @param value valor del parámetro
-   */
   public Headers add(String key, String value) {
     namesAndValues.add(key);
     namesAndValues.add(value);
     return this;
   }
   
-  /** Devuelve el último valor correspondiente al campo especificado, o nulo. */
   public String key(int index) {
     return namesAndValues.get(index * 2);
   }
   
-  /** Devuelve el valor en el índice. */
   public String value(int index) {
     return namesAndValues.get(index * 2 + 1);
   }
   
-  /** Devuelve el último valor correspondiente al campo especificado, o nulo. */
   public String value(String key) {
     for (int i = namesAndValues.size() - 2; i >= 0; i -= 2) {
       if (key.equalsIgnoreCase(namesAndValues.get(i))) {
@@ -56,7 +47,6 @@ public class Headers {
     return null;
   }
 
-  /** Devuelve encabezados para los nombres y valores de encabezado en el Mapa. */
   public static Headers of(Map<String, List<String>> map) {
     Headers headers = new Headers(map.size());
     for (Map.Entry<String, List<String>> entry : map.entrySet()) {

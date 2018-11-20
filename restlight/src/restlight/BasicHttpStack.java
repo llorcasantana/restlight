@@ -6,16 +6,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import restlight.io.IOUtils;
 
-public class BasicHttpStack implements HttpStack {   
-  private static BasicHttpStack instance;
-  
-  public static BasicHttpStack getInstance() {
-    if (instance == null) instance = new BasicHttpStack();
-    return instance;
-  }
+public class BasicHttpStack implements HttpStack { 
   
   /**
-   * Ejecuta una petición a internet.
+   * Ejecuta una petición.
    *
    * @param request petición a ejecutar
    *
@@ -24,7 +18,7 @@ public class BasicHttpStack implements HttpStack {
    * @throws java.lang.Exception
    */
   @Override
-  public <T> Response.Network<T> execute(Request<T> request) throws IOException {
+  public <T> Response<T> execute(Request<T> request) throws IOException {
     HttpURLConnection conn = open(request);
     writeHeaders(conn, request);
     setParametersForRequest(conn, request);
@@ -36,20 +30,20 @@ public class BasicHttpStack implements HttpStack {
       throw new IOException("Could not retrieve response code from HttpUrlConnection.");
     }
 
-    Response.Network<T> response = new Response.Network<T>(responseCode);
+    Response<T> response = new Response<T>(request);
+    response.code = responseCode;
     response.headers = Headers.of(conn.getHeaderFields());
     response.contentLength = conn.getContentLength();
     response.contentEncoding = conn.getContentEncoding();
     response.contentType = conn.getContentType();
-    response.source = conn.getInputStream();
-    response.request = request;
+    response.inputStream = conn.getInputStream();
     return response;
   }
   
   /**
-   * Abre una conexión HTTP a intenert apartir de un recurso URL.
+   * Abre una conexión HTTP a intenert apartir de una petición.
    *
-   * @param src recurso de conección.
+   * @param src conección.
    *
    * @return una conexión HTTP abierta.
    *
@@ -121,11 +115,11 @@ public class BasicHttpStack implements HttpStack {
   }
 
   /**
-   * Metodo que se encargar de eviar los datos de la petición a internet por 
-   * medio de una escritura de streams.
+   * Metodo que se encargar de eviar los datos a internet por medio de una
+   * escritura de streams.
    *
    * @param conn conexión abierta a internet
-   * @param request peticion a inyectar
+   * @param request peticion
    *
    * @throws java.io.IOException
    */

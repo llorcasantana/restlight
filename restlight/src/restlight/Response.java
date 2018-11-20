@@ -1,23 +1,25 @@
-
 package restlight;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import restlight.io.IOUtils;
 
-public class Response<T> {
-
-  final int code;  
+public class Response<T> implements Closeable {
+  final Request<T> request;
+  int code;  
   Headers headers;
   String contentEncoding;
   String contentType;
   int contentLength;
-  Request<T> request;
   T result;
+  InputStream inputStream;
 
-  public Response(int code) {
-    this.code = code;
+  public Response(Request<T> request) {
+    this.request = request;
   }
   
   public int code() { return code; }
@@ -33,28 +35,37 @@ public class Response<T> {
   public Request<T> request() { return request; }
   
   public T result() { return result; }
-  
+    
+  public InputStream inputStream() { 
+    return inputStream; 
+  }
+  public Reader charStream(Charset charset) throws IOException {
+    return new InputStreamReader(inputStream, charset);
+  }
+  public byte[] bytes() throws IOException {
+    //try {
+      return IOUtils.toByteArray(inputStream);
+//    } finally {
+//      IOUtils.closeQuietly(inputStream);
+//    }
+  }
+  public String string(Charset charset) throws IOException {
+    byte[] data = bytes();
+    return new String(data, charset);
+  }
+  public Response<T> parseResponse() throws Exception {
+    if (result != null) return this;
+    try {
+      result = request.parseResponse(this);
+      return this;
+    } finally {
+      close();
+    }
+  }
+  @Override public void close() {
+    IOUtils.closeQuietly(inputStream);
+  }   
   @Override public String toString() {
     return String.valueOf(result);
-  }
-  
-  public static class Network<T> extends Response<T> implements Closeable {
-    InputStream source;
-    public Network(int code) {
-      super(code);
-    }
-    public InputStream source() { 
-      return source; 
-    }
-    public byte[] readByteArray() throws IOException {
-      return IOUtils.toByteArray(source);
-    }
-    public Response<T> response() throws Exception {
-      if (result == null) result = request.parseResponse(this);
-      return this;
-    }
-    @Override public void close() {
-      IOUtils.closeQuietly(source);
-    }
   }
 }

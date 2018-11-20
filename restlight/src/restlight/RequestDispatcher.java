@@ -1,7 +1,5 @@
 package restlight;
 
-import restlight.io.IOUtils;
-
 /*import android.os.Process;*/
 
 public class RequestDispatcher extends Thread {
@@ -51,16 +49,12 @@ public class RequestDispatcher extends Thread {
         if (request.isCanceled()) continue;
 
         // Procesa la request.
-        Response.Network response = null;
-        try {
-          response = mQueue.mNetwork.execute(request);
-          // Si la petición ya estaba cancelada, no funciona la petición de la red.
-          if (request.isCanceled()) continue;
+        Response response = mQueue.mNetwork.execute(request);
+        // Si la petición ya estaba cancelada, no funciona la petición de la red.
+        if (request.isCanceled()) continue;
          
-          deliveryResponse(request, response.response());
-        } finally {
-          IOUtils.closeQuietly(response);
-        }
+        deliveryResponse(request, response.parseResponse());
+        
       } catch (Exception e) {
         // TODO: handle exception
         deliveryErrorResponse(request, e);

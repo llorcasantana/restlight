@@ -20,8 +20,8 @@ public class Delete {
             .setUrl(url)
             .setMethod("DELETE");
 
-    try (Response.Network<String> net = stack.execute(request)) {
-      return request.parseResponse(net);
+    try (Response<String> response = stack.execute(request)) {
+      return request.parseResponse(response);
     }
   }
 

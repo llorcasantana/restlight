@@ -15,7 +15,7 @@ public class Dowload {
             .setUrl("https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar")
             .setMethod("GET");
 
-    try (Response.Network<File> net = stack.execute(request)) {
+    try (Response<File> net = stack.execute(request)) {
       return request.parseResponse(net);
     }
   }

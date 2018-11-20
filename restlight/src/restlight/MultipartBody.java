@@ -45,19 +45,10 @@ public class MultipartBody implements RequestBody {
     return boundary;
   }
   
-  /**
-   * Devuelve el encabezado Content-Type para este cuerpo.
-   * @param charset codificación para este cuerpo.
-   */
   @Override public String contentType(Charset charset) {
     return "multipart/form-data; boundary=" + boundary;
   }
   
-  /**
-   * Devuelve la cantidad de bytes que se escribirán para hundirse en una 
-   * llamada a {@link #writeTo(java.io.OutputStream, java.nio.charset.Charset) }
-   * @param charset codificación para este cuerpo.
-   */
   @Override public long contentLength(Charset charset) throws IOException {
     long len = 0;
     for (int i = 0; i < parts.size(); i++) {
@@ -74,11 +65,6 @@ public class MultipartBody implements RequestBody {
     }
   }
 
-  /**
-   * Escribe el contenido de esta solicitud para hundirse.
-   * @param out flujo de streams
-   * @param chrst codificación para este cuerpo.
-   */
   @Override public void writeTo(OutputStream out, Charset charset) throws IOException {
     doWrite(out, charset, Boolean.TRUE);
   }
@@ -107,27 +93,16 @@ public class MultipartBody implements RequestBody {
     out.write(CR_LF);
   }
 
-  /** Agrega un nuevo parámetro a este cuerpo. */
   public MultipartBody addPart(Part<?> bodyPart) {
     parts.add(bodyPart);
     return this;
   }
 
-  /**
-   * Agregue un parámetro de datos de formulario al cuerpo.
-   * @param name llave del parámetro
-   * @param value valor del parámetro
-   */
   public MultipartBody addParam(String name, Object value) {
     String newValue = value == null ? "" : value.toString();
     return addPart(new StringPart(name, newValue));
   }
 
-  /**
-   * Agregue un parámetro de datos de formulario al cuerpo.
-   * @param name llave del parámetro
-   * @param value valor del parámetro
-   */
   public MultipartBody addFile(String name, File value) {
     return addPart(new FilePart(name, value));
   }
@@ -148,7 +123,7 @@ public class MultipartBody implements RequestBody {
     public String key() {
       return key;
     }
-
+    
     public T value() {
       return value;
     }
@@ -157,23 +132,23 @@ public class MultipartBody implements RequestBody {
       return String.valueOf(value);
     }
    
-    /**
-     * Escribe los campos de encabezado multiparte; depende del estilo.
-     */
+   /**
+    * Escribe los campos de encabezado multiparte; depende del estilo.
+    */
     public abstract void writeHeaders(OutputStream out, Charset charset) throws IOException;
   
     public abstract long contentLength(Charset charset) throws IOException;
 
-    /**
-     * Inicia la escritura del part a internet en bits.
-     *
-     * @param out flujo de salida
-     * @param charset codificacion
-     *
-     * @throws java.io.IOException
-     */
+   /**
+    * Inicia la escritura del part a internet en bits.
+    *
+    * @param out flujo de salida
+    * @param charset codificacion
+    *
+    * @throws java.io.IOException
+    */
     public abstract void writeTo(OutputStream out, Charset charset) throws IOException;
-  }
+    }
   
   /*
    * ====================================================================

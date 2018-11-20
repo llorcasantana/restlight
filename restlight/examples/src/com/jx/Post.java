@@ -22,8 +22,8 @@ public class Post {
             .setMethod("POST")
             .setBody(body);
 
-    try (Response.Network<String> net = stack.execute(request)) {
-      return request.parseResponse(net);
+    try (Response<String> response = stack.execute(request)) {
+      return request.parseResponse(response);
     }
   }
 

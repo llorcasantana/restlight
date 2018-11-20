@@ -15,8 +15,8 @@ public class Get {
             .setUrl(url)
             .setMethod("GET");
 
-    try (Response.Network<String> net = stack.execute(request)) {
-      return request.parseResponse(net);
+    try (Response<String> response = stack.execute(request)) {
+      return request.parseResponse(response);
     }
   }
 

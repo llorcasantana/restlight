@@ -44,7 +44,7 @@ public abstract class Request<T> implements Callback<T> {
    *
    * @throws java.lang.Exception
    */
-  public abstract T parseResponse(Response.Network<T> response) throws Exception;
+  public abstract T parseResponse(Response<T> response) throws Exception;
 
   /**
    * @return true si se cancelo la peticion.
