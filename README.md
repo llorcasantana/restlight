@@ -150,7 +150,7 @@ public final class WebService {
   public <T> Request<T> gsonRequest(final Class<T> classOf) {
     return new Request<T>() {
       @Override
-      public T parseResponse(Response.Network<T> response) throws Exception {
+      public T parseResponse(Response<T> response) throws Exception {
         String json = response.string(getCharset());
         return gson.fromJson(json, classOf);
       }
