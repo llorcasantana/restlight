@@ -88,7 +88,7 @@ public class Restlight {
    * servidor
    */
   public <T> Response<T> execute(Request<T> request) throws Exception {
-    return getStack().execute(request).parseResponse();
+    return getStack().execute(request).parseRequest(request);
   }
   
   /**

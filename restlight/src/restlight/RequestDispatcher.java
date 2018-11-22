@@ -53,7 +53,7 @@ public class RequestDispatcher extends Thread {
         // Si la petición ya estaba cancelada, no funciona la petición de la red.
         if (request.isCanceled()) continue;
          
-        deliveryResponse(request, response.parseResponse());
+        deliveryResponse(request, response.parseRequest(request));
         
       } catch (Exception e) {
         // TODO: handle exception

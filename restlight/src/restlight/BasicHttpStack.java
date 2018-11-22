@@ -30,7 +30,7 @@ public class BasicHttpStack implements HttpStack {
       throw new IOException("Could not retrieve response code from HttpUrlConnection.");
     }
 
-    Response<T> response = new Response<T>(request);
+    Response<T> response = new Response<T>();
     response.code = responseCode;
     response.headers = Headers.of(conn.getHeaderFields());
     response.contentLength = conn.getContentLength();
