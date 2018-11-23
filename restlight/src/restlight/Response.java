@@ -51,7 +51,6 @@ public class Response<T> implements Closeable {
   }
   
   public Response<T> parseRequest(Request<T> request) throws Exception {
-    if (result != null) return this;
     try {
       result = request.parseResponse(this);
       return this;
