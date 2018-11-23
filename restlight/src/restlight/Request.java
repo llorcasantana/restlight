@@ -92,6 +92,10 @@ public abstract class Request<T> implements Callback<T> {
     this.url = url;
     return this;
   }
+  public Request<T> setUrl(HttpUrl url) {
+    this.url = url.toString();
+    return this;
+  }
    
   public String getMethod() {
     return method;
