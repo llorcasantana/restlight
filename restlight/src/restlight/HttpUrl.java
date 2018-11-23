@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HttpUrl {
-  Charset charset = Request.DEFAULT_ENCODING;
   final List<String> namesAndValues = new ArrayList<String>();
   String url;
 
@@ -17,14 +16,6 @@ public class HttpUrl {
   }
   public String getUrl() {
     return url;
-  }
-  
-  public Charset getCharset() {
-    return charset;
-  }
-  public HttpUrl setCharset(Charset charset) {
-    this.charset = charset;
-    return this;
   }
   
   public int size() {
@@ -45,7 +36,7 @@ public class HttpUrl {
     return namesAndValues.get(index * 2 + 1);
   }
   
-  public String encodedUrlParams() throws IOException {
+  public String encodedUrlParams(Charset charset) throws IOException {
     final String chrst = charset.name();
     StringBuilder sql = new StringBuilder();
     for (int i = 0, size = size(); i < size; i++) {
@@ -57,9 +48,9 @@ public class HttpUrl {
     return sql.toString();
   }
 
-  @Override public String toString() {
+  public String toString(Charset charset) {
     try {
-      String encodedParams = encodedUrlParams();
+      String encodedParams = encodedUrlParams(charset);
       if (encodedParams != null && encodedParams.length() > 0) {
         return new StringBuilder(url.length() + 1 + encodedParams.length())
               .append(url)
@@ -70,5 +61,9 @@ public class HttpUrl {
       // empty
     }
     return url;
+  }
+  
+  @Override public String toString() {
+    return toString(Request.DEFAULT_ENCODING);
   }
 }
