@@ -1,9 +1,9 @@
 package restlight.io;
 
-import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,7 +93,7 @@ public final class IOUtils {
     } catch (IOException ioe) {
       inputStream = connection.getErrorStream();
     }
-    return new BufferedInputStream(inputStream) {
+    return new FilterInputStream(inputStream) {
       @Override public void close() throws IOException {
         super.close();
         connection.disconnect();
