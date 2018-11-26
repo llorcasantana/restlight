@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import restlight.io.IOUtils;
+import restlight.io.UrlConnectionInputStream;
 
 public class BasicHttpStack implements HttpStack { 
   
@@ -36,7 +37,7 @@ public class BasicHttpStack implements HttpStack {
     response.contentLength = conn.getContentLength();
     response.contentEncoding = conn.getContentEncoding();
     response.contentType = conn.getContentType();
-    response.inputStream = conn.getInputStream();
+    response.inputStream = new UrlConnectionInputStream(conn);
     return response;
   }
   

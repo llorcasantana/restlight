@@ -30,13 +30,7 @@ public class Response<T> implements Closeable {
   
   public T result() { return result; }
     
-  public InputStream inputStream() { 
-    return inputStream; 
-  }
-  
-  public boolean isClosed() {
-    return closed;
-  }
+  public InputStream inputStream() { return inputStream; }
   
   public Reader charStream(Charset charset) throws IOException {
     return new InputStreamReader(inputStream, charset);
@@ -62,6 +56,10 @@ public class Response<T> implements Closeable {
     } finally {
       close();
     }
+  }
+  
+  public boolean isClosed() {
+    return closed;
   }
   
   @Override public void close() {
