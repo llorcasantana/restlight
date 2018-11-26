@@ -16,7 +16,8 @@ public class Response<T> implements Closeable {
   int contentLength;
   T result;
   InputStream inputStream;
-
+  boolean closed;
+  
   public int code() { return code; }
 
   public Headers headers() { return headers; }
@@ -33,16 +34,20 @@ public class Response<T> implements Closeable {
     return inputStream; 
   }
   
+  public boolean isClosed() {
+    return closed;
+  }
+  
   public Reader charStream(Charset charset) throws IOException {
     return new InputStreamReader(inputStream, charset);
   }
   
   public byte[] bytes() throws IOException {
-    //try {
+    try {
       return IOUtils.toByteArray(inputStream);
-//    } finally {
-//      IOUtils.closeQuietly(inputStream);
-//    }
+    } finally {
+      close();
+    }
   }
   
   public String string(Charset charset) throws IOException {
@@ -60,7 +65,10 @@ public class Response<T> implements Closeable {
   }
   
   @Override public void close() {
-    IOUtils.closeQuietly(inputStream);
+    if (!closed) {
+      closed = true;
+      IOUtils.closeQuietly(inputStream);
+    }
   }   
   
   @Override public String toString() {
