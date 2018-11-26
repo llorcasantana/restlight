@@ -1,11 +1,13 @@
 package restlight.io;
 
+import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 
 public final class IOUtils {
 
@@ -75,6 +77,28 @@ public final class IOUtils {
       POOL.returnBuf(buffer);
       bytes.close();
     }
+  }
+   
+  /**
+   * Wrapper for a {@link HttpURLConnection}'s InputStream which disconnects the
+   * connection on stream close.
+   *
+   * @param connection
+   * @return an HttpEntity populated with data from <code>connection</code>.
+   */
+  public static InputStream inputStreamFromConnection(final HttpURLConnection connection) {
+    InputStream inputStream;
+    try {
+      inputStream = connection.getInputStream();
+    } catch (IOException ioe) {
+      inputStream = connection.getErrorStream();
+    }
+    return new BufferedInputStream(inputStream) {
+      @Override public void close() throws IOException {
+        super.close();
+        connection.disconnect();
+      }
+    };
   }
 
   public static void closeQuietly(Closeable closeable) {
