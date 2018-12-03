@@ -93,8 +93,7 @@ public abstract class Request<T> implements Callback<T> {
     return this;
   }
   public Request<T> setUrl(HttpUrl url) {
-    this.url = url.toString(getCharset());
-    return this;
+    return setUrl(url.toString(getCharset()));
   }
    
   public String getMethod() {

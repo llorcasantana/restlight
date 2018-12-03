@@ -9,15 +9,15 @@ import java.nio.charset.Charset;
 import restlight.io.IOUtils;
 
 public class Response<T> implements Closeable {
-  int code;  
-  Headers headers;
-  String contentEncoding;
-  String contentType;
-  int contentLength;
-  T result;
-  InputStream inputStream;
-  boolean closed;
-  
+  protected int code;  
+  protected Headers headers;
+  protected String contentEncoding;
+  protected String contentType;
+  protected int contentLength;
+  protected T result;
+  protected InputStream inputStream;
+  protected boolean closed;
+
   public int code() { return code; }
 
   public Headers headers() { return headers; }
@@ -29,8 +29,14 @@ public class Response<T> implements Closeable {
   public int contentLength() { return contentLength; }
   
   public T result() { return result; }
-    
-  public InputStream inputStream() { return inputStream; }
+  
+  public boolean isClosed() {
+    return closed;
+  }
+  
+  public InputStream inputStream() { 
+    return inputStream; 
+  }
   
   public Reader charStream(Charset charset) throws IOException {
     return new InputStreamReader(inputStream, charset);
@@ -58,13 +64,9 @@ public class Response<T> implements Closeable {
     }
   }
   
-  public boolean isClosed() {
-    return closed;
-  }
-  
   @Override public void close() {
     if (!closed) {
-      closed = true;
+      closed = Boolean.TRUE;
       IOUtils.closeQuietly(inputStream);
     }
   }   

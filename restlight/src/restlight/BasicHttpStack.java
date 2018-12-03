@@ -36,7 +36,7 @@ public class BasicHttpStack implements HttpStack {
     response.contentLength = conn.getContentLength();
     response.contentEncoding = conn.getContentEncoding();
     response.contentType = conn.getContentType();
-    response.inputStream = IOUtils.inputStreamFromConnection(conn);
+    response.inputStream = IOUtils.inputStream(conn);
     return response;
   }
   

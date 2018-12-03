@@ -1,6 +1,5 @@
 package restlight.widget;
 
-import restlight.widget.ImageLoader.ImageCache;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Build;

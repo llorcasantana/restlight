@@ -67,16 +67,6 @@ public class ImageLoader {
     private Runnable mRunnable;
 
     /**
-     * Simple cache adapter interface. If provided to the ImageLoader, it
-     * will be used as an L1 cache before dispatch to Volley. Implementations
-     * must not block. Implementation with an LruCache is recommended.
-     */
-    public interface ImageCache {
-        Bitmap getBitmap(String url);
-        void putBitmap(String url, Bitmap bitmap);
-    }
-
-    /**
      * Constructs a new ImageLoader.
      * @param queue The RequestQueue to use for making image requests.
      * @param imageCache The cache to use as an L1 cache.

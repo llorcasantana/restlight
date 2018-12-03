@@ -59,6 +59,21 @@ public final class IOUtils {
     return new PoolingByteArrayOutputStream(POOL, size);
   }
   
+  public static InputStream inputStream(final HttpURLConnection hurlc) {
+    InputStream inputStream;
+    try {
+      inputStream = hurlc.getInputStream();
+    } catch(IOException e) {
+      inputStream = hurlc.getErrorStream();
+    }
+    return new FilterInputStream(inputStream) {
+      @Override public void close() {
+        IOUtils.closeQuietly(in);
+        hurlc.disconnect();
+      }
+    };
+  }
+  
   public static byte[] toByteArray(InputStream source) throws IOException {
     return toByteArray(source, 1024);
   }
@@ -77,28 +92,6 @@ public final class IOUtils {
       POOL.returnBuf(buffer);
       bytes.close();
     }
-  }
-   
-  /**
-   * Wrapper for a {@link HttpURLConnection}'s InputStream which disconnects the
-   * connection on stream close.
-   *
-   * @param connection
-   * @return an HttpEntity populated with data from <code>connection</code>.
-   */
-  public static InputStream inputStreamFromConnection(final HttpURLConnection connection) {
-    InputStream inputStream;
-    try {
-      inputStream = connection.getInputStream();
-    } catch (IOException ioe) {
-      inputStream = connection.getErrorStream();
-    }
-    return new FilterInputStream(inputStream) {
-      @Override public void close() throws IOException {
-        super.close();
-        connection.disconnect();
-      }
-    };
   }
 
   public static void closeQuietly(Closeable closeable) {
