@@ -15,28 +15,26 @@ public class RequestQueue {
   static final int DEFAULT_NETWORK_THREAD_POOL_SIZE = 4;
   
   /** Cola de peticiones que se procesaran a la red. */
-  final BlockingQueue<Request<?>> mNetworkQueue;
+  private final BlockingQueue<Request<?>> networkQueue;
   
   /** Objeto que procesa las peticiones a internet. */
-  final HttpStack mNetwork;
-  
-  /** Puente que comunica las tareas con el hilo principal. */
-  final Executor mExecutor;
+  private final Restlight restlight;
   
   /** Hilo que atendera la cola. */
-  final Thread[] mDispatchers;
+  private final Thread[] dispatchers;
 
-  public RequestQueue(HttpStack network, Executor executor, Thread[] dispatchers) {
-    mNetworkQueue = new LinkedBlockingQueue<Request<?>>();
-    mNetwork = network;
-    mExecutor = executor;
-    mDispatchers = dispatchers;
+  public RequestQueue(Restlight restlight, Thread[] dispatchers) {
+    this.networkQueue = new LinkedBlockingQueue<Request<?>>();
+    this.restlight = restlight;
+    this.dispatchers = dispatchers;
   }
-  public RequestQueue(HttpStack network, Executor executor, int threadPoolSize) {
-    this(network, executor, new Thread[threadPoolSize]);
-  } 
-  public RequestQueue(HttpStack network, Executor executor) {
-    this(network, executor, DEFAULT_NETWORK_THREAD_POOL_SIZE);
+  
+  public RequestQueue(Restlight restlight, int threadPoolSize) {
+    this(restlight, new Thread[threadPoolSize]);
+  }
+  
+  public RequestQueue(Restlight restlight) {
+    this(restlight, DEFAULT_NETWORK_THREAD_POOL_SIZE);
   }
 
   /**
@@ -44,9 +42,9 @@ public class RequestQueue {
    */
   public void start() {
     stop();
-    for (int i = 0; i < mDispatchers.length; i++) {
-      mDispatchers[i] = new RequestDispatcher(this);
-      mDispatchers[i].start();
+    for (int i = 0; i < dispatchers.length; i++) {
+      dispatchers[i] = new RequestDispatcher(this);
+      dispatchers[i].start();
     }
   }
 
@@ -54,10 +52,10 @@ public class RequestQueue {
    * Obliga a detener todos los hilos.
    */
   public void stop() {
-    for (int i = 0; i < mDispatchers.length; i++) {
-      if (mDispatchers[i] != null) {
-        mDispatchers[i].interrupt();
-        mDispatchers[i] = null;
+    for (int i = 0; i < dispatchers.length; i++) {
+      if (dispatchers[i] != null) {
+        dispatchers[i].interrupt();
+        dispatchers[i] = null;
       }
     }
   }
@@ -69,7 +67,7 @@ public class RequestQueue {
    * @return La peticion al servicio
    */
   public <T> Request<T> add(Request<T> request) {
-    mNetworkQueue.add(request);
+    networkQueue.add(request);
     return request;
   }
   
@@ -80,7 +78,7 @@ public class RequestQueue {
    * @return La peticion removida
    */
   public <T> Request<T> remove(Request<T> request) {
-    mNetworkQueue.remove(request);
+    networkQueue.remove(request);
     return request;
   }
   
@@ -88,8 +86,8 @@ public class RequestQueue {
    * Cancela todas las peticiones en esta cola.
    */
   public void cancelAll() {
-    synchronized (mNetworkQueue) {
-      for (Request<?> request : mNetworkQueue) {
+    synchronized (networkQueue) {
+      for (Request<?> request : networkQueue) {
         request.cancel();
       }
     }
@@ -99,19 +97,27 @@ public class RequestQueue {
    * Cancela todas las peticiones de esta cola con la etiqueta dada.
    */
   public void cancelAll(final Object tag) {
-    synchronized (mNetworkQueue) {
-      for (Request<?> request : mNetworkQueue) {
+    synchronized (networkQueue) {
+      for (Request<?> request : networkQueue) {
         if (request.getTag() == tag) {
           request.cancel();
         }
       }
     }
-  }
-
+  } 
+  
   /**
    * @return La cola de despacho.
    */
-  public BlockingQueue<Request<?>> queue() {
-    return mNetworkQueue;
+  public BlockingQueue<Request<?>> networkQueue() {
+    return networkQueue;
   }  
+  
+  public HttpStack stack() {
+    return restlight.getStack();
+  }
+  
+  public Executor executorDelivery() {
+    return restlight.getExecutorDelivery();
+  }
 }

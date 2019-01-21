@@ -5,16 +5,16 @@ package restlight;
 public class RequestDispatcher extends Thread {
 
   /** Cola de peticiones al servidor. */
-  private final RequestQueue mQueue;
+  private final RequestQueue queue;
   
   /** Es usado para decir que el hilo a muerto. */
-  private volatile boolean mQuit = false;
+  private volatile boolean quit = false;
 
   /**
    * @param queue cola de peticiones.
    */
   public RequestDispatcher(RequestQueue queue) {
-    mQueue = queue;
+    this.queue = queue;
     setPriority(MIN_PRIORITY);
   }
 
@@ -22,7 +22,7 @@ public class RequestDispatcher extends Thread {
    * Obliga al hilo a detenerce inmediatamente.
    */
   @Override public void interrupt() {
-    mQuit = true;
+    quit = true;
     super.interrupt();
   }
 
@@ -37,10 +37,10 @@ public class RequestDispatcher extends Thread {
       Request<?> request;
       try {
         // Toma y quita la peticion de la cola.
-        request = mQueue.mNetworkQueue.take();
+        request = queue.networkQueue().take();
       } catch (InterruptedException e) {
         // El hilo pudo haber sido interrumpido.
-        if (mQuit) return;
+        if (quit) return;
         continue;
       }
 
@@ -49,25 +49,29 @@ public class RequestDispatcher extends Thread {
         if (request.isCanceled()) continue;
 
         // Procesa la request.
-        Response response = mQueue.mNetwork.execute(request);
+        Response response = queue.stack().execute(request);
+        
         // Si la petición ya estaba cancelada, no funciona la petición de la red.
-        if (request.isCanceled()) continue;
+        if (request.isCanceled()) {
+          response.close();
+          continue;
+        }
          
-        deliveryResponse(request, response.parseRequest(request));
+        this.onResponse(request, response.parseRequest(request));
         
       } catch (Exception e) {
         // TODO: handle exception
-        deliveryErrorResponse(request, e);
+        this.onErrorResponse(request, e);
       }
     }
   }
-
+  
   /**
    * Metodo que se encarga de liverar la respuesta obtenida de la conexión.
    */
   @SuppressWarnings("rawtypes")
-  private void deliveryResponse(final Callback callback, final Response response) {
-    mQueue.mExecutor.execute(new Runnable() {  
+  public void onResponse(final Callback callback, final Response response) {
+    queue.executorDelivery().execute(new Runnable() {  
       @SuppressWarnings("unchecked")
       @Override
       public void run() {
@@ -83,12 +87,12 @@ public class RequestDispatcher extends Thread {
   /**
    * Metodo que se encarga de liverar el error obtenido de la conexión.
    */
-  private void deliveryErrorResponse(final Callback<?> callback, final Exception error) {
-    mQueue.mExecutor.execute(new Runnable() {
+  public void onErrorResponse(final Callback<?> callback, final Exception error) {
+    queue.executorDelivery().execute(new Runnable() {
       @Override public void run() {
         callback.onErrorResponse(error);
       }
     });
   }
- 
+
 }

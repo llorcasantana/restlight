@@ -8,17 +8,21 @@ public class Restlight {
   private static Restlight instance;
  
   /** Procesara las peticiones a internet. */
-  private HttpStack mStack;
+  private HttpStack httpStack;
   
   /** Puente que comunica las tareas con el hilo principal. */
-  private Executor mExecutor;
+  private Executor executorDelivery;
   
   /** Cola de peticiones al servidor. */
-  private RequestQueue mQueue;
+  private RequestQueue requestQueue;
  
 // TODO: Constructor...
 
-  public Restlight() {
+  private Restlight() {
+    httpStack = new BasicHttpStack();
+    executorDelivery = Platform.get();
+    requestQueue = new RequestQueue(this);
+    requestQueue.start();
   }
   
   public static Restlight getInstance() {
@@ -29,43 +33,28 @@ public class Restlight {
 // TODO: Funciones...
   
   public HttpStack getStack() {
-    if (mStack == null) setStack(new BasicHttpStack());
-    return mStack;
-  }
-  public void setStack(HttpStack stack) {
-    mStack = stack;
-    if (mQueue != null) {
-      if (stack != mQueue.mNetwork) {
-        mQueue = new RequestQueue(stack, mQueue.mExecutor, mQueue.mDispatchers);
-      }
-    }
+    return httpStack;
   }
   
-  public Executor getExecutor() {
-    if (mExecutor == null) setExecutor(Platform.get());
-    return mExecutor;
+  public void setStack(HttpStack stack) {
+    httpStack = stack;
   }
-  public void setExecutor(Executor executor) {
-    mExecutor = executor;
-    if (mQueue != null) {
-      if (executor != mQueue.mExecutor) {
-        mQueue = new RequestQueue(mQueue.mNetwork, executor, mQueue.mDispatchers);
-      }
-    }
+  
+  public Executor getExecutorDelivery() {
+    return executorDelivery;
+  }
+  
+  public void setExecutorDelivery(Executor executor) {
+    executorDelivery = executor;
   }
   
   public RequestQueue getQueue() {
-    if (mQueue == null) {
-      mQueue = new RequestQueue(getStack(), getExecutor());
-      mQueue.start();
-    }
-    return mQueue;
+    return requestQueue;
   }
-  public void setQueue(RequestQueue queue) {
-    if (mQueue != null) mQueue.stop();
-    mQueue = queue;
-    mStack = mQueue.mNetwork;
-    mExecutor = mQueue.mExecutor;
+  
+  public void setQueue(RequestQueue queue, boolean quit) {
+    if (requestQueue != null && quit) requestQueue.stop();
+    requestQueue = queue;
   }
   
   /**

@@ -19,9 +19,21 @@ public class BasicHttpStack implements HttpStack {
    */
   @Override
   public <T> Response<T> execute(Request<T> request) throws IOException {
-    HttpURLConnection conn = open(request);
+    HttpURLConnection conn = null;
+    try {
+      conn = open(request);
+      if (request.isCanceled()) throw new IOException("request is cancel");
+      return execute(conn, request);
+    } catch (IOException e) {
+      if (conn != null) conn.disconnect();
+      throw e;
+    }
+  }
+  
+  <T> Response<T> execute(HttpURLConnection conn, Request<T> request) 
+  throws IOException {
     writeHeaders(conn, request);
-    setParametersForRequest(conn, request);
+    writeBody(conn, request);
 
     int responseCode = conn.getResponseCode();
     if (responseCode == -1) {
@@ -79,38 +91,38 @@ public class BasicHttpStack implements HttpStack {
   /**
    * Manda una lista de encabezados adicionales de HTTP para esta petición.
    *
-   * @param connection HTTP
+   * @param conn HTTP
    * @param request peticion
    *
    * @throws IOException
    */
-  public void writeHeaders(HttpURLConnection connection,
-          Request<?> request) throws IOException {
+  public void writeHeaders(HttpURLConnection conn, Request<?> request)
+  throws IOException {
     Headers headers = request.getHeaders();
     if (headers != null) {
       int len = headers.size();
       for (int i = 0; i < len; i++) {
-        connection.addRequestProperty(headers.key(i), headers.value(i));
+        conn.addRequestProperty(headers.key(i), headers.value(i));
       }
     }
   }
   
   /**
-   * Lista de encabezados adicionales de HTTP para esta petición.
+   * Escribe el cuerpo de de esta petición.
    *
-   * @param connection HTTP
+   * @param conn HTTP
    * @param request peticion
    *
    * @throws IOException
    */
-  public void setParametersForRequest(HttpURLConnection connection,
-          Request<?> request) throws IOException {
+  public void writeBody(HttpURLConnection conn, Request<?> request) 
+  throws IOException {
     String method = request.getMethod();
-    connection.setRequestMethod(method);
+    conn.setRequestMethod(method);
 
     if (method.equals("POST") || method.equals("PUT")) {
       // Write request to server.
-      writeTo(connection, request);
+      writeTo(conn, request);
     }
   }
 
