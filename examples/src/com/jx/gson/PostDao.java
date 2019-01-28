@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 // import restlight.BasicHttpStack;
 import restlight.Call;
 import restlight.Request;
+import restlight.RequestBody;
 import restlight.Restlight;
 import restlight.StringRequest;
 import restlight.body.FormBodyAdapter;
@@ -36,7 +37,7 @@ public class PostDao {
   
   public Call<String> insert(Post p) {
 //    GsonBody<Persona> body = new GsonBody<Persona>(gson, p);
-    FormBodyAdapter body = FormBodyAdapter.of(p);
+    RequestBody body = FormBodyAdapter.formUrlEncoded(p);
     
     Request<String> request = new StringRequest()
             .setMethod("POST")
