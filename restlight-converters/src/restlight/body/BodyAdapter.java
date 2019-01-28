@@ -4,9 +4,9 @@ import java.io.File;
 import restlight.FormBody;
 import restlight.MultipartBody;
 
-public final class FormBodyAdapter {
+public final class BodyAdapter {
 
-  private FormBodyAdapter() {
+  private BodyAdapter() {
   }
   
   public static FormBody formUrlEncoded(Object src) {

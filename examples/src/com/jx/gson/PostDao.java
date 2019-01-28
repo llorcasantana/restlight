@@ -12,7 +12,7 @@ import restlight.Request;
 import restlight.RequestBody;
 import restlight.Restlight;
 import restlight.StringRequest;
-import restlight.body.FormBodyAdapter;
+import restlight.body.BodyAdapter;
 import restlight.request.GsonRequest;
 
 public class PostDao {
@@ -37,7 +37,7 @@ public class PostDao {
   
   public Call<String> insert(Post p) {
 //    GsonBody<Persona> body = new GsonBody<Persona>(gson, p);
-    RequestBody body = FormBodyAdapter.formUrlEncoded(p);
+    RequestBody body = BodyAdapter.formUrlEncoded(p);
     
     Request<String> request = new StringRequest()
             .setMethod("POST")
