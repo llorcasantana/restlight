@@ -191,7 +191,7 @@ Envía de manera asíncrona la petición y notifica a tu aplicación con un call
 Dao dao = new Dao();
     
 Call<Post[]> call = dao.getPosts(); 
-call.queue(new Callback<Post[]>() {
+call.execute(new Callback<Post[]>() {
   @Override
   public void onResponse(Response<Post[]> response) throws Exception {
     List<Post> list = Arrays.asList(response.result());
@@ -200,7 +200,7 @@ call.queue(new Callback<Post[]>() {
     }
   }
   @Override
-  public void onErrorResponse(Exception e) {
+  public void onFailure(Exception e) {
     e.printStackTrace(System.out);
   }
 });

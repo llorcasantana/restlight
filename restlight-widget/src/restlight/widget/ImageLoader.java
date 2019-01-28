@@ -248,7 +248,7 @@ public class ImageLoader {
             }
         	
         	@Override
-            public void onErrorResponse(Exception error) {
+            public void onFailure(Exception error) {
                 onGetImageError(cacheKey, error);
             }
         };

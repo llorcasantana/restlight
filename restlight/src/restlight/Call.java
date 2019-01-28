@@ -8,14 +8,7 @@ public interface Call<T> {
    * procesar la respuesta.
    * @param callback devolución de llamada
    */
-  void queue(Callback<T> callback);
-  
-  /**
-   * Envíe sincrónicamente la solicitud y devuelva su respuesta.
-   * @return respuesta
-   * @throws Exception si se produjo un problema al hablar con el servidor.
-   */
-  Response<T> execute() throws Exception;
+  void execute(Callback<T> callback);
   
   /**
    * Devuelve la petición de la invocación del método.

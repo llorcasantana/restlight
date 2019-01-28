@@ -81,8 +81,8 @@ public abstract class Request<T> implements Callback<T> {
    *
    * @param error ocurrido
    */
-  @Override public void onErrorResponse(Exception error) {
-    if (callback != null) callback.onErrorResponse(error);
+  @Override public void onFailure(Exception error) {
+    if (callback != null) callback.onFailure(error);
   }
 
   public String getUrl() {

@@ -61,7 +61,7 @@ public class RequestDispatcher extends Thread {
         
       } catch (Exception e) {
         // TODO: handle exception
-        this.onErrorResponse(request, e);
+        this.onFailure(request, e);
       }
     }
   }
@@ -78,7 +78,7 @@ public class RequestDispatcher extends Thread {
         try {
           callback.onResponse(response);
         } catch (Exception error) {
-          callback.onErrorResponse(error);
+          callback.onFailure(error);
         }
       }
     });
@@ -87,10 +87,10 @@ public class RequestDispatcher extends Thread {
   /**
    * Metodo que se encarga de liverar el error obtenido de la conexión.
    */
-  public void onErrorResponse(final Callback<?> callback, final Exception error) {
+  public void onFailure(final Callback<?> callback, final Exception error) {
     queue.executorDelivery().execute(new Runnable() {
       @Override public void run() {
-        callback.onErrorResponse(error);
+        callback.onFailure(error);
       }
     });
   }

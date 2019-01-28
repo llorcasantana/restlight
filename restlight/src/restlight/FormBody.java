@@ -18,8 +18,8 @@ import restlight.io.IOUtils;
 
 public class FormBody implements RequestBody {
 
-  private final List<String> keys = new ArrayList<String>();
-  private final List<Object> values = new ArrayList<Object>();
+  protected final List<String> keys = new ArrayList<String>();
+  protected final List<Object> values = new ArrayList<Object>();
 
   /**
    * @param charset

@@ -21,8 +21,6 @@ public class Restlight {
   private Restlight() {
     httpStack = new BasicHttpStack();
     executorDelivery = Platform.get();
-    requestQueue = new RequestQueue(this);
-    requestQueue.start();
   }
   
   public static Restlight getInstance() {
@@ -48,7 +46,11 @@ public class Restlight {
     executorDelivery = executor;
   }
   
-  public RequestQueue getQueue() {
+  public synchronized RequestQueue getQueue() {
+    if (requestQueue == null) {
+      requestQueue = new RequestQueue(this);
+      requestQueue.start();
+    }
     return requestQueue;
   }
   
@@ -89,12 +91,9 @@ public class Restlight {
    */
   public <T> Call<T> newCall(final Request<T> request) {
     return new Call<T>() {
-      @Override public void queue(Callback<T> callback) {
+      @Override public void execute(Callback<T> callback) {
         request.setCallback(callback);
         Restlight.this.queue(request);
-      }
-      @Override public Response<T> execute() throws Exception {
-        return Restlight.this.execute(request);
       }
       @Override public Request<T> request() {
         return request;

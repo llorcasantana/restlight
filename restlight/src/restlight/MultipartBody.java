@@ -26,10 +26,10 @@ public class MultipartBody implements RequestBody {
   public static final byte[] TWO_DASHES = {'-', '-'};
 
   /** Lista de datos. */
-  private final List<Part<?>> parts;
+  protected final List<Part<?>> parts;
   
   /** Variable requerida para : multipart/form-data. */
-  private final String boundary;
+  protected final String boundary;
   
   
   public MultipartBody() {
