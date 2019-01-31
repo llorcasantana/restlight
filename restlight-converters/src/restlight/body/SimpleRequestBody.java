@@ -1,12 +1,25 @@
 package restlight.body;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 import restlight.FormBody;
 import restlight.MultipartBody;
+import restlight.RequestBody;
 
-public final class BodyAdapter {
+public final class SimpleRequestBody implements RequestBody {
 
-  private BodyAdapter() {
+  final String data;
+  final String contentType;
+  
+  private SimpleRequestBody(String data, String contentType) {
+    this.data = data;
+    this.contentType = contentType;
+  }
+  
+  public static RequestBody create(String data, String contentType) {
+    return new SimpleRequestBody(data, contentType);
   }
   
   public static FormBody formUrlEncoded(Object src) {
@@ -81,5 +94,26 @@ public final class BodyAdapter {
 //    RequestBody body = multipart(p);
 //    body.writeTo(System.out, Charset.defaultCharset());
 //  }
+
+  @Override
+  public String contentType(Charset charset) throws IOException {
+    if (!contentType.contains("charset")) {
+      StringBuilder sb = new StringBuilder(contentType);
+      sb.append("; charset=");
+      sb.append(charset.name());
+      return sb.toString();
+    }
+    return contentType;
+  }
+
+  @Override
+  public long contentLength(Charset charset) throws IOException {
+    return data.getBytes(charset).length;
+  }
+
+  @Override
+  public void writeTo(OutputStream out, Charset charset) throws IOException {
+    out.write(data.getBytes(charset));
+  }
 
 }

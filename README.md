@@ -10,6 +10,22 @@ Envíe sincrónicamente la solicitud y devuelva su respuesta.
 BasicHttpStack stack = new BasicHttpStack();
 ```
 
+### Basic POST
+```
+StringRequest request = new StringRequest();
+request.setMethod("POST");
+request.setUrl("http://www.example.com");
+    
+FormBody body = new FormBody();
+body.add("username", "John");
+body.add("password", "pass");
+request.setBody(body);
+    
+Response<String> response = stack.execute(request);
+response.parseRequest(request);
+System.out.println(response.result());
+```
+
 ### GET
 ```
 String run() throws Exception {
