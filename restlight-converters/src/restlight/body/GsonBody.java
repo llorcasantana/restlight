@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 import restlight.RequestBody;
 import restlight.io.IOUtils;
 
-public class GsonBody<T> implements RequestBody {
+public class GsonBody<T> extends RequestBody {
 
   private final Gson gson;
   private final T src;

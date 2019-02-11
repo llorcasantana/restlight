@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import restlight.io.IOUtils;
 
-public class MultipartBody implements RequestBody {
+public class MultipartBody extends RequestBody {
   /** Espacio colon */
   public static final byte[] COLON_SPACE = {':', ' '};
   
@@ -26,7 +26,7 @@ public class MultipartBody implements RequestBody {
   public static final byte[] TWO_DASHES = {'-', '-'};
 
   /** Lista de datos. */
-  protected final List<Part<?>> parts;
+  protected final List<Part> parts;
   
   /** Variable requerida para : multipart/form-data. */
   protected final String boundary;
@@ -37,7 +37,7 @@ public class MultipartBody implements RequestBody {
   }
 
   public MultipartBody(String boundary) {
-    this.parts = new ArrayList<Part<?>>();
+    this.parts = new ArrayList<Part>();
     this.boundary = boundary;
   }
   
@@ -52,8 +52,8 @@ public class MultipartBody implements RequestBody {
   @Override public long contentLength(Charset charset) throws IOException {
     long len = 0;
     for (int i = 0; i < parts.size(); i++) {
-      Part<?> part = parts.get(i);
-      len += part.contentLength(charset);
+      Part part = parts.get(i);
+      len += part.body.contentLength(charset);
     }
     ByteArrayOutputStream baos = null;
     try {
@@ -72,17 +72,27 @@ public class MultipartBody implements RequestBody {
   private void doWrite(OutputStream out, Charset charset, boolean write) throws IOException {
     byte[] boundaryToCharArray = boundary.getBytes();
 
-    for (Part<?> part : parts) {
+    for (Part part : parts) {      
       out.write(TWO_DASHES);
       out.write(boundaryToCharArray);
       out.write(CR_LF);
 
       // Write Format Multipart Header:
-      part.writeHeaders(out, charset);
-
+      int len = part.headers.size();
+      for (int i = 0; i < len; i++) {
+        out.write(part.headers.key(i).getBytes(charset));
+        out.write(COLON_SPACE);
+        out.write(part.headers.value(i).getBytes(charset));
+        out.write(CR_LF);
+      }
+      out.write(Headers.CONTENT_TYPE.getBytes(charset));
+      out.write(COLON_SPACE);
+      out.write(part.body.contentType(charset).getBytes(charset));
+      out.write(CR_LF);
+      
       // Write Body:
       out.write(CR_LF);
-      if (write) part.writeTo(out, charset);
+      if (write) part.body.writeTo(out, charset);
       out.write(CR_LF);
     }
 
@@ -93,141 +103,69 @@ public class MultipartBody implements RequestBody {
     out.write(CR_LF);
   }
 
-  public MultipartBody addPart(Part<?> bodyPart) {
+  public MultipartBody addPart(Part bodyPart) {
     parts.add(bodyPart);
     return this;
   }
-
+  
   public MultipartBody addParam(String name, Object value) {
     String newValue = value == null ? "" : value.toString();
-    return addPart(new StringPart(name, newValue));
+    RequestBody body = RequestBody.create("text/plain", newValue);
+    return addPart(Part.createFormData(name, body));
   }
 
-  public MultipartBody addFile(String name, File value) {
-    return addPart(new FilePart(name, value));
+  public MultipartBody addFile(String name, File file) {
+    return addFile(name, file, file.getName());
+  }
+  
+  public MultipartBody addFile(String name, File file, String filename) {
+    RequestBody body = RequestBody.create("application/octet-stream", file, Boolean.FALSE);
+    return addPart(Part.createFormData(name, filename, body));
+  }
+  
+  public MultipartBody addFile(String name, byte[] value, String filename) {
+    RequestBody body = RequestBody.create("application/octet-stream", value, Boolean.FALSE);
+    return addPart(Part.createFormData(name, filename, body));
   }
 
-  public List<Part<?>> parts() {
+  public List<Part> parts() {
     return parts;
   }
   
-  public static abstract class Part<T> {
-    protected final String key;
-    protected final T value;
+  public static class Part {
 
-    public Part(String key, T value) {
-      this.key = key;
-      this.value = value;
-    }
-  
-    public String key() {
-      return key;
-    }
-    
-    public T value() {
-      return value;
-    }
-  
-    @Override public String toString() {
-      return String.valueOf(value);
-    }
-   
-   /**
-    * Escribe los campos de encabezado multiparte; depende del estilo.
-    */
-    public abstract void writeHeaders(OutputStream out, Charset charset) throws IOException;
-  
-    public abstract long contentLength(Charset charset) throws IOException;
+    final RequestBody body;
+    final Headers headers;
 
-   /**
-    * Inicia la escritura del part a internet en bits.
-    *
-    * @param out flujo de salida
-    * @param charset codificacion
-    *
-    * @throws java.io.IOException
-    */
-    public abstract void writeTo(OutputStream out, Charset charset) throws IOException;
-    }
-  
-  /*
-   * ====================================================================
-   * Clase modelo que contendra el nombre del input y el valor que se 
-   * enviara por una petición a internet.
-   * ====================================================================
-   */
-  public static class StringPart extends Part<String> {
-
-    public StringPart(String key, String value) {
-      super(key, (value == null) ? "" : value);
-    }  
-
-    @Override
-    public void writeHeaders(OutputStream out, Charset charset) throws IOException {
-      out.write(Headers.CONTENT_DISPOSITION.getBytes(charset));
-      out.write(COLON_SPACE);
-      out.write(String.format("form-data; name=\"%s\"", key).getBytes(charset));
-      out.write(CR_LF);
-
-      out.write(Headers.CONTENT_TYPE.getBytes(charset));
-      out.write(COLON_SPACE);
-      out.write(String.format("text/plain; charset=%s", charset.name()).getBytes(charset));
-      out.write(CR_LF);
-
-      out.write(Headers.CONTENT_TRANSFER_ENCODING.getBytes(charset));
-      out.write(COLON_SPACE);
-      out.write("8bit".getBytes(charset));
-      out.write(CR_LF);
+    public Part(RequestBody body, Headers headers) {
+      this.body = body;
+      this.headers = headers;
     }
 
-    @Override public long contentLength(Charset charset) throws IOException {
-      return value.getBytes(charset).length;
+    public Headers headers() {
+      return headers;
+    }
+
+    public RequestBody body() {
+      return body;
     }
     
-    @Override
-    public void writeTo(OutputStream out, Charset charset) throws IOException {
-      out.write(value.getBytes(charset));
+    public static Part createFormData(String name, RequestBody body) {
+      Headers headers = Headers.of(
+              Headers.CONTENT_DISPOSITION, String.format("form-data; name=\"%s\"", name),
+              // .add(Headers.CONTENT_TYPE, String.format("text/plain; charset=%s", charset.name()))
+              Headers.CONTENT_TRANSFER_ENCODING, "8bit");
+      return new Part(body, headers);
+    }
+
+    public static Part createFormData(String name, String filename, RequestBody body) {
+      Headers headers = Headers.of(
+              Headers.CONTENT_DISPOSITION, String.format("form-data; name=\"%s\"; filename=\"%s\"", name, filename),
+              // .add(Headers.CONTENT_TYPE, "application/octet-stream")
+              Headers.CONTENT_TRANSFER_ENCODING, "binary");
+      return new Part(body, headers);
     }
   }
   
-  /*
-   * ====================================================================
-   * Clase modelo que contendra el nombre del input y el archivo que se 
-   * enviara por una petición a internet.
-   * ====================================================================
-   */
-  public static class FilePart extends Part<File> {
   
-    public FilePart(String key, File value) {
-      super(key, value);
-    }
-
-    @Override
-    public void writeHeaders(OutputStream out, Charset charset) throws IOException {
-      out.write(Headers.CONTENT_DISPOSITION.getBytes(charset));
-      out.write(COLON_SPACE);
-      out.write(String.format("form-data; name=\"%s\"; filename=\"%s\"", key, value.getName()).getBytes(charset));
-      out.write(CR_LF);
-
-      out.write(Headers.CONTENT_TYPE.getBytes(charset));
-      out.write(COLON_SPACE);
-      out.write("application/octet-stream".getBytes(charset));
-      //URLConnection.guessContentTypeFromName(file.getName())
-      out.write(CR_LF);
-
-      out.write(Headers.CONTENT_TRANSFER_ENCODING.getBytes(charset));
-      out.write(COLON_SPACE);
-      out.write("binary".getBytes(charset));
-      out.write(CR_LF);
-    }
-
-    @Override public long contentLength(Charset charset) throws IOException {
-      return value.length();
-    }
-
-    @Override
-    public void writeTo(OutputStream out, Charset charset) throws IOException {
-      IOUtils.copy(value, out);
-    }
-  }
 }

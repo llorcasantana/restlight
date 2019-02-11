@@ -1,6 +1,6 @@
 package restlight.widget;
 
-import restlight.Response;
+import restlight.ResponseBody;
 import restlight.Request;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -65,14 +65,14 @@ public class ImageRequest extends Request<Bitmap> {
         return resized;
     }
 
-    public Bitmap parseResponse(Response<Bitmap> response) throws Exception {
+    public Bitmap parseResponse(ResponseBody response) throws Exception {
     	 // Serialize all decode on a global lock to reduce concurrent heap usage.
         synchronized (sDecodeLock) {
         	return doParse(response);
         }
     }
 
-    private Bitmap doParse(Response<Bitmap> response) throws Exception {
+    private Bitmap doParse(ResponseBody response) throws Exception {
     	byte[] data = response.bytes();
         BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
         Bitmap bitmap = null;

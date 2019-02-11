@@ -15,7 +15,7 @@ public class DownloadRequest extends Request<File> {
   }
 
   @Override
-  public File parseResponse(Response<File> response) throws Exception {
+  public File parseResponse(ResponseBody response) throws Exception {
     File file = new File(mDownloadPath);
     BufferedOutputStream bos = null;
     try {

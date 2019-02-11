@@ -1,14 +1,14 @@
 package com.jx;
 
-import restlight.BasicHttpStack;
+import restlight.HttpUrlStack;
 import restlight.FormBody;
 import restlight.Request;
-import restlight.Response;
+import restlight.ResponseBody;
 import restlight.StringRequest;
 
 public class Post {
 
-  BasicHttpStack stack = new BasicHttpStack();
+  HttpUrlStack stack = new HttpUrlStack();
 
   String run() throws Exception {
     FormBody body = new FormBody()
@@ -16,13 +16,12 @@ public class Post {
             .add("edad", 22)
             .add("soltera", false);
     
-    String url = "http://127.0.0.1/test.php";
     Request<String> request = new StringRequest()
-            .setUrl(url)
+            .setUrl("http://127.0.0.1/test.php")
             .setMethod("POST")
             .setBody(body);
 
-    try (Response<String> response = stack.execute(request)) {
+    try (ResponseBody response = stack.execute(request)) {
       return request.parseResponse(response);
     }
   }

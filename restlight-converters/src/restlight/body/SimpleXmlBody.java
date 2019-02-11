@@ -9,7 +9,7 @@ import org.simpleframework.xml.Serializer;
 import restlight.RequestBody;
 import restlight.io.IOUtils;
 
-public class SimpleXmlBody<T> implements RequestBody {
+public class SimpleXmlBody<T> extends RequestBody {
 
   private final Serializer serializer;
   private final T src;

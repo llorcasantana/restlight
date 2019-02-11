@@ -1,21 +1,20 @@
 package com.jx;
 
-import restlight.BasicHttpStack;
+import restlight.HttpUrlStack;
 import restlight.Request;
-import restlight.Response;
+import restlight.ResponseBody;
 import restlight.StringRequest;
 
 public class Get {
 
-  BasicHttpStack stack = new BasicHttpStack();
+  HttpUrlStack stack = new HttpUrlStack();
 
   String run() throws Exception {
-    String url = "http://weather.livedoor.com/forecast/webservice/json/v1?city=130010";
     Request<String> request = new StringRequest()
-            .setUrl(url)
+            .setUrl("http://weather.livedoor.com/forecast/webservice/json/v1?city=130010")
             .setMethod("GET");
 
-    try (Response<String> response = stack.execute(request)) {
+    try (ResponseBody response = stack.execute(request)) {
       return request.parseResponse(response);
     }
   }

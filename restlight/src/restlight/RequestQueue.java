@@ -17,24 +17,24 @@ public class RequestQueue {
   /** Cola de peticiones que se procesaran a la red. */
   private final BlockingQueue<Request<?>> networkQueue;
   
-  /** Objeto que procesa las peticiones a internet. */
-  private final Restlight restlight;
+  /** Procesara las peticiones a internet. */
+  private HttpStack httpStack;
+  
+  /** Puente que comunica las tareas con el hilo principal. */
+  private Executor executorDelivery;
   
   /** Hilo que atendera la cola. */
   private final Thread[] dispatchers;
 
-  public RequestQueue(Restlight restlight, Thread[] dispatchers) {
-    this.networkQueue = new LinkedBlockingQueue<Request<?>>();
-    this.restlight = restlight;
-    this.dispatchers = dispatchers;
+  public RequestQueue(int threadPoolSize) {
+    networkQueue = new LinkedBlockingQueue<Request<?>>();
+    httpStack = new HttpUrlStack();
+    executorDelivery = Platform.get();
+    dispatchers = new Thread[threadPoolSize];
   }
   
-  public RequestQueue(Restlight restlight, int threadPoolSize) {
-    this(restlight, new Thread[threadPoolSize]);
-  }
-  
-  public RequestQueue(Restlight restlight) {
-    this(restlight, DEFAULT_NETWORK_THREAD_POOL_SIZE);
+  public RequestQueue() {
+    this(DEFAULT_NETWORK_THREAD_POOL_SIZE);
   }
 
   /**
@@ -114,10 +114,18 @@ public class RequestQueue {
   }  
   
   public HttpStack stack() {
-    return restlight.getStack();
+    return httpStack;
+  }
+
+  public void setStack(HttpStack stack) {
+    httpStack = stack;
   }
   
   public Executor executorDelivery() {
-    return restlight.getExecutorDelivery();
+    return executorDelivery;
+  }
+  
+  public void setExecutorDelivery(Executor executor) {
+    executorDelivery = executor;
   }
 }

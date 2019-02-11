@@ -44,7 +44,7 @@ public abstract class Request<T> implements Callback<T> {
    *
    * @throws java.lang.Exception
    */
-  public abstract T parseResponse(Response<T> response) throws Exception;
+  public abstract T parseResponse(ResponseBody response) throws Exception;
 
   /**
    * @return true si se cancelo la peticion.
@@ -68,12 +68,12 @@ public abstract class Request<T> implements Callback<T> {
   /**
    * Livera la respuesta por la Interfaz.
    *
-   * @param response resultado obtenido
+   * @param result resultado obtenido
    *
    * @throws java.lang.Exception
    */
-  @Override public void onResponse(Response<T> response) throws Exception {
-    if (callback != null) callback.onResponse(response);
+  @Override public void onResponse(T result) throws Exception {
+    if (callback != null) callback.onResponse(result);
   }
 
   /**

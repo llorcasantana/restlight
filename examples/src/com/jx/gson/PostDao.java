@@ -12,7 +12,7 @@ import restlight.Request;
 import restlight.RequestBody;
 import restlight.Restlight;
 import restlight.StringRequest;
-import restlight.body.SimpleRequestBody;
+import restlight.body.GsonBody;
 import restlight.request.GsonRequest;
 
 public class PostDao {
@@ -28,7 +28,7 @@ public class PostDao {
   }
 
   public Call<Post[]> getPosts() {
-    Request<Post[]> request = GsonRequest.newRequest(gson, Post[].class)
+    Request<Post[]> request = GsonRequest.of(gson, Post[].class)
             .setUrl("https://kylewbanks.com/rest/posts.json")
             .setMethod("GET");
 
@@ -36,8 +36,7 @@ public class PostDao {
   }
   
   public Call<String> insert(Post p) {
-//    GsonBody<Persona> body = new GsonBody<Persona>(gson, p);
-    RequestBody body = SimpleRequestBody.formUrlEncoded(p);
+    GsonBody<Post> body = new GsonBody<Post>(gson, p);
     
     Request<String> request = new StringRequest()
             .setMethod("POST")

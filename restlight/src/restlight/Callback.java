@@ -4,10 +4,10 @@ public interface Callback<T> {
   /**
    * Se llama cuando se recibe una respuesta.
    *
-   * @param response respuesta obtenida
+   * @param result respuesta obtenida
    * @throws java.lang.Exception error al recibir la respueta
    */
-  void onResponse(Response<T> response) throws Exception;
+  void onResponse(T result) throws Exception;
   
   /**
    * Método de devolución de llamada que indica que se ha producido un error con

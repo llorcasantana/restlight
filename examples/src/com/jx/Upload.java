@@ -1,28 +1,27 @@
 package com.jx;
 
 import java.io.File;
-import restlight.BasicHttpStack;
+import restlight.HttpUrlStack;
 import restlight.MultipartBody;
 import restlight.Request;
-import restlight.Response;
+import restlight.ResponseBody;
 import restlight.StringRequest;
 
 public class Upload {
 
-  BasicHttpStack stack = new BasicHttpStack();
+  HttpUrlStack stack = new HttpUrlStack();
 
   String run() throws Exception { 
     MultipartBody body = new MultipartBody()
             .addParam("nombre", "Elizabéth Magaña")
             .addFile("img", new File("C:\\Users\\jesus\\Pictures\\420089-Kycb_1600x1200.jpg"));
     
-    String url = "http://127.0.0.1/test.php";
     Request<String> request = new StringRequest()
-            .setUrl(url)
+            .setUrl("http://127.0.0.1/test.php")
             .setMethod("POST")
             .setBody(body);
 
-    try (Response<String> response = stack.execute(request)) {
+    try (ResponseBody response = stack.execute(request)) {
       return request.parseResponse(response);
     }
   }

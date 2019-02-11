@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import restlight.Call;
 import restlight.Callback;
-import restlight.Response;
 
 public class Gson {
 
@@ -15,8 +14,8 @@ public class Gson {
     
     call.execute(new Callback<Post[]>() {
       @Override
-      public void onResponse(Response<Post[]> response) throws Exception {
-        List<Post> list = Arrays.asList(response.result());
+      public void onResponse(Post[] result) throws Exception {
+        List<Post> list = Arrays.asList(result);
         for (Post post : list) {
           System.out.println(post.title);
         }

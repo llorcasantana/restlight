@@ -28,7 +28,6 @@ import java.util.LinkedList;
 
 import restlight.Request;
 import restlight.RequestQueue;
-import restlight.Response;
 
 /**
  * Helper that handles loading and caching images from remote URLs.
@@ -243,8 +242,8 @@ public class ImageLoader {
             ScaleType scaleType, final String cacheKey) {
         return new ImageRequest(requestUrl, maxWidth, maxHeight, scaleType, Config.RGB_565) {
         	@Override
-            public void onResponse(Response<Bitmap> response) {
-                onGetImageSuccess(cacheKey, response.result());
+            public void onResponse(Bitmap result) {
+                onGetImageSuccess(cacheKey, result);
             }
         	
         	@Override

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import restlight.io.IOUtils;
 
-public class FormBody implements RequestBody {
+public class FormBody extends RequestBody {
 
   protected final List<String> keys = new ArrayList<String>();
   protected final List<Object> values = new ArrayList<Object>();

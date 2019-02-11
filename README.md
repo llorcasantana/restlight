@@ -1,4 +1,4 @@
-## Restlight
+## RestLight
 
 Restlight es una librería **HTTP** para Android y Java, que facilita la creación de peticiones **HTTP** como: GET, POST, HEAD, OPTIONS, PUT, DELETE y TRACE; hacia servidores externos. [Descargar .jar](https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar) o [Ver demo](https://github.com/JesusBetaX/restlight/tree/master/examples/src/com/jx) 
 
@@ -7,7 +7,7 @@ Restlight es una librería **HTTP** para Android y Java, que facilita la creaci�
 Creamos un objeto para ejecutar las request.  
 Envíe sincrónicamente la solicitud y devuelva su respuesta.
 ```
-BasicHttpStack stack = new BasicHttpStack();
+HttpUrlStack stack = new HttpUrlStack();
 ```
 
 ### Basic POST
@@ -21,9 +21,8 @@ body.add("username", "John");
 body.add("password", "pass");
 request.setBody(body);
     
-Response<String> response = stack.execute(request);
-response.parseRequest(request);
-System.out.println(response.result());
+ResponseBody response = stack.execute(request);
+System.out.println(request.parseResponse(response));
 ```
 
 ### GET
@@ -34,7 +33,7 @@ String run() throws Exception {
           .setUrl(url)
           .setMethod("GET");
 
-  try (Response<String> response = stack.execute(request)) {
+  try (ResponseBody response = stack.execute(request)) {
     return request.parseResponse(response);
   }
 }
@@ -53,7 +52,7 @@ String run() throws Exception {
           .setMethod("POST")
           .setBody(body);
 
-  try (Response<String> response = stack.execute(request)) {
+  try (ResponseBody response = stack.execute(request)) {
     return request.parseResponse(response);
   }
 }
@@ -62,16 +61,15 @@ String run() throws Exception {
 ### DELETE
 ```
 String run() throws Exception {
-  String url = new HttpUrl()
+  HttpUrl url = new HttpUrl()
           .setUrl("http://127.0.0.1/test.php")
-          .addQueryParameter("id", 101010)
-          .toString();
+          .addQueryParameter("id", 101010);
 
   Request<String> request = new StringRequest()
           .setUrl(url)
           .setMethod("DELETE");
 
-  try (Response<String> response = stack.execute(request)) {
+  try (ResponseBody response = stack.execute(request)) {
     return request.parseResponse(response);
   }
 }
@@ -85,7 +83,7 @@ File run() throws Exception {
           .setUrl("https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar")
           .setMethod("GET");
 
-  try (Response<File> response = stack.execute(request)) {
+  try (ResponseBody response = stack.execute(request)) {
     return request.parseResponse(response);
   }
 }
@@ -103,7 +101,7 @@ String run() throws Exception {
           .setMethod("POST")
           .setBody(body);
 
-  try (Response<String> response = stack.execute(request)) {
+  try (ResponseBody response = stack.execute(request)) {
     return request.parseResponse(response);
   }
 }
@@ -119,6 +117,8 @@ dependencies {
   compile 'com.google.code.gson:gson:2.4'
 }
 ```
+
+[Y descargar restlight-converters.jar](https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight-converters.jar)
 
 
 Ahora estamos listos para comenzar a escribir un código. Lo primero que querremos hacer es definir nuestro modelo **Post**
@@ -143,59 +143,27 @@ public class Post {
 
 Creemos una nueva instancia de **GSON** antes de llamar a la request. También necesitaremos establecer un formato de fecha personalizado en la instancia **GSON** para manejar las fechas que devuelve la API:
 
-```
-public final class WebService {
-
-  private static WebService instance;
-  
-  private final Gson gson = new GsonBuilder()
-  		.setDateFormat("M/d/yy hh:mm a")
-		.create();
-  
-  private final Restlight restlight;
-  
-  private WebService() {
-    restlight = Restlight.getInstance();
-  }
-  
-  public static WebService getInstance() {
-    if (instance == null)  instance = new WebService();
-    return instance;
-  }
-  
-  public <T> Request<T> gsonRequest(final Class<T> classOf) {
-    return new Request<T>() {
-      @Override
-      public T parseResponse(Response<T> response) throws Exception {
-        String json = response.string(getCharset());
-        return gson.fromJson(json, classOf);
-      }
-    };
-  }
-  
-  public Restlight restlight() {
-    return restlight;
-  }
-}
-```
-
-
 Definimos las interacciones de la base de datos. Pueden incluir una variedad de métodos de consulta.:
 
 ```
 public class Dao {
-  WebService service;
+  private Gson gson;
+  private Restlight restlight;
     
   public Dao() {
-    service = WebService.getInstance();
+    gson = new GsonBuilder()
+  		.setDateFormat("M/d/yy hh:mm a")
+      .create();
+
+    restlight = Restlight.getInstance();
   }
 
   public Call<Post[]> getPosts() {
-    Request<Post[]> request = service.gsonRequest(Post[].class)
+    Request<Post[]> request = GsonRequest.of(gson, Post[].class)
             .setUrl("https://kylewbanks.com/rest/posts.json")
             .setMethod("GET");
     
-    return service.restlight().newCall(request);
+    return restlight.newCall(request);
   }
 }
 ```
@@ -209,8 +177,8 @@ Dao dao = new Dao();
 Call<Post[]> call = dao.getPosts(); 
 call.execute(new Callback<Post[]>() {
   @Override
-  public void onResponse(Response<Post[]> response) throws Exception {
-    List<Post> list = Arrays.asList(response.result());
+  public void onResponse(Post[] result) throws Exception {
+    List<Post> list = Arrays.asList(result);
     for (Post post : list) {
       System.out.println(post.title);
     }

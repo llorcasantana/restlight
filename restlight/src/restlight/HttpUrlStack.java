@@ -6,51 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import restlight.io.IOUtils;
 
-public class BasicHttpStack implements HttpStack { 
-  
-  /**
-   * Ejecuta una petición.
-   *
-   * @param request petición a ejecutar
-   *
-   * @return el resultado de la petición realizada
-   *
-   * @throws java.lang.Exception
-   */
-  @Override
-  public <T> Response<T> execute(Request<T> request) throws IOException {
-    HttpURLConnection conn = null;
-    try {
-      conn = open(request);
-      if (request.isCanceled()) throw new IOException("request is cancel");
-      return execute(conn, request);
-    } catch (IOException e) {
-      if (conn != null) conn.disconnect();
-      throw e;
-    }
-  }
-  
-  <T> Response<T> execute(HttpURLConnection conn, Request<T> request) 
-  throws IOException {
-    writeHeaders(conn, request);
-    writeBody(conn, request);
-
-    int responseCode = conn.getResponseCode();
-    if (responseCode == -1) {
-      // -1 is returned by getResponseCode() if the response code could not be retrieved.
-      // Signal to the caller that something was wrong with the connection.
-      throw new IOException("Could not retrieve response code from HttpUrlConnection.");
-    }
-
-    Response<T> response = new Response<T>();
-    response.code = responseCode;
-    response.headers = Headers.of(conn.getHeaderFields());
-    response.contentLength = conn.getContentLength();
-    response.contentEncoding = conn.getContentEncoding();
-    response.contentType = conn.getContentType();
-    response.inputStream = IOUtils.inputStream(conn);
-    return response;
-  }
+public class HttpUrlStack implements HttpStack { 
   
   /**
    * Abre una conexión HTTP a intenert apartir de una petición.
@@ -155,6 +111,52 @@ public class BasicHttpStack implements HttpStack {
       } finally {
         IOUtils.closeQuietly(bos);
       }
+    }
+  }
+  
+  public ResponseBody response(HttpURLConnection conn, Request<?> request) 
+  throws IOException {
+    int responseCode = conn.getResponseCode();
+    if (responseCode == -1) {
+      // -1 is returned by getResponseCode() if the response code could not be retrieved.
+      // Signal to the caller that something was wrong with the connection.
+      throw new IOException("Could not retrieve response code from HttpUrlConnection.");
+    }
+    
+    ResponseBody response = new ResponseBody();
+    response.code = responseCode;
+    response.headers = Headers.of(conn.getHeaderFields());
+    response.contentLength = conn.getContentLength();
+    response.contentEncoding = conn.getContentEncoding();
+    response.contentType = conn.getContentType();
+    response.inputStream = IOUtils.inputStream(conn);
+    return response;
+  }
+  
+  /**
+   * Ejecuta una petición.
+   *
+   * @param request petición a ejecutar
+   *
+   * @return el resultado de la petición realizada
+   *
+   * @throws java.lang.Exception
+   */
+  @Override
+  public ResponseBody execute(Request<?> request) throws IOException {
+    HttpURLConnection conn = null;
+    try {
+      conn = open(request);
+      
+      if (request.isCanceled()) throw new IOException("request is cancel");
+      
+      writeHeaders(conn, request);
+      writeBody(conn, request);
+      return response(conn, request);
+      
+    } catch (IOException e) {
+      if (conn != null) conn.disconnect();
+      throw e;
     }
   }
 }

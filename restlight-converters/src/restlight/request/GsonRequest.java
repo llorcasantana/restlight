@@ -1,9 +1,8 @@
 package restlight.request;
 
 import com.google.gson.Gson;
-import java.io.Reader;
 import restlight.Request;
-import restlight.Response;
+import restlight.ResponseBody;
 
 public class GsonRequest<T> extends Request<T> {
 
@@ -16,16 +15,16 @@ public class GsonRequest<T> extends Request<T> {
    * @param gson
    * @param classOf Relevant class object, for Gson's reflection
    */
-  private GsonRequest(Gson gson, Class<T> classOf) {
+  public GsonRequest(Gson gson, Class<T> classOf) {
     this.gson = gson;
     this.classOf = classOf;
   }
 
-  public static <V> Request<V> newRequest(Gson gson, Class<V> classOf) {
+  public static <V> GsonRequest<V> of(Gson gson, Class<V> classOf) {
     return new GsonRequest<V>(gson, classOf);
   }
   
-  public static <V> Request<V> newRequest(Class<V> classOf) {
+  public static <V> GsonRequest<V> of(Class<V> classOf) {
     return new GsonRequest<V>(new Gson(), classOf);
   }
 
@@ -38,9 +37,9 @@ public class GsonRequest<T> extends Request<T> {
   }
 
   @Override
-  public T parseResponse(Response<T> response) throws Exception {
-    Reader json = response.charStream(getCharset());
-    //String json = response.string(getCharset());
+  public T parseResponse(ResponseBody response) throws Exception {
+    //Reader json = response.charStream(getCharset());
+    String json = response.string(getCharset());
     return gson.fromJson(json, classOf);
   }
 }

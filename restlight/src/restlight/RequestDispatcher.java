@@ -49,15 +49,15 @@ public class RequestDispatcher extends Thread {
         if (request.isCanceled()) continue;
 
         // Procesa la request.
-        Response response = queue.stack().execute(request);
+        ResponseBody responseBody = queue.stack().execute(request);
         
         // Si la petición ya estaba cancelada, no funciona la petición de la red.
         if (request.isCanceled()) {
-          response.close();
+          responseBody.close();
           continue;
         }
          
-        this.onResponse(request, response.parseRequest(request));
+        this.onResponse(request, responseBody.result(request));
         
       } catch (Exception e) {
         // TODO: handle exception
@@ -70,7 +70,7 @@ public class RequestDispatcher extends Thread {
    * Metodo que se encarga de liverar la respuesta obtenida de la conexión.
    */
   @SuppressWarnings("rawtypes")
-  public void onResponse(final Callback callback, final Response response) {
+  public void onResponse(final Callback callback, final Object response) {
     queue.executorDelivery().execute(new Runnable() {  
       @SuppressWarnings("unchecked")
       @Override

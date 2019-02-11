@@ -1,26 +1,25 @@
 package com.jx;
 
-import restlight.BasicHttpStack;
+import restlight.HttpUrlStack;
 import restlight.HttpUrl;
 import restlight.Request;
-import restlight.Response;
+import restlight.ResponseBody;
 import restlight.StringRequest;
 
 public class Delete {
 
-  BasicHttpStack stack = new BasicHttpStack();
+  HttpUrlStack stack = new HttpUrlStack();
 
   String run() throws Exception {
-    String url = new HttpUrl()
+    HttpUrl url = new HttpUrl()
             .setUrl("http://127.0.0.1/test.php")
-            .addQueryParameter("id", 101010)
-            .toString();
+            .addQueryParameter("id", 101010);
 
     Request<String> request = new StringRequest()
             .setUrl(url)
             .setMethod("DELETE");
 
-    try (Response<String> response = stack.execute(request)) {
+    try (ResponseBody response = stack.execute(request)) {
       return request.parseResponse(response);
     }
   }
