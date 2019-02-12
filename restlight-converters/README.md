@@ -1,5 +1,3 @@
-```
-
 Programa la solicitud para ser ejecutada en segundo plano. Ideal para aplicaciones android. 
 Envía de manera asíncrona la petición y notifica a tu aplicación con un callback cuando una respuesta regresa.
 ```
