@@ -152,7 +152,7 @@ public class Dao {
     
   public Dao() {
     gson = new GsonBuilder()
-  	    .setDateFormat("M/d/yy hh:mm a")
+        .setDateFormat("M/d/yy hh:mm a")
         .create();
 
     restlight = Restlight.getInstance();
