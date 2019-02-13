@@ -7,12 +7,16 @@ public class Restlight {
 // TODO: Varibles...
   private static Restlight instance;
 
-  /** Cola de peticiones al servidor. */
+  /** Define el esquema. */
+  private final Performance performance;
+  
+  /** Procesa las peticiones a l servidor.  */
   private RequestQueue requestQueue;
- 
+  
 // TODO: Constructor...
 
   private Restlight() {
+    performance = new Performance();
   }
   
   public static Restlight getInstance() {
@@ -27,24 +31,24 @@ public class Restlight {
 // TODO: Funciones...
   
   public HttpStack getStack() {
-    return getQueue().stack();
+    return performance.stack();
   }
   
   public void setStack(HttpStack stack) {
-    getQueue().setStack(stack);
+    performance.setStack(stack);
   }
   
   public Executor getExecutorDelivery() {
-    return getQueue().executorDelivery();
+    return performance.executorDelivery();
   }
   
   public void setExecutorDelivery(Executor executor) {
-    getQueue().setExecutorDelivery(executor);
+    performance.setExecutorDelivery(executor);
   }
   
   public RequestQueue getQueue() {
     if (requestQueue == null) {
-      requestQueue = new RequestQueue();
+      requestQueue = new RequestQueue(performance);
       requestQueue.start();
     }
     return requestQueue;
@@ -90,6 +94,9 @@ public class Restlight {
       @Override public void execute(Callback<V> callback) {
         request.setCallback(callback);
         Restlight.this.queue(request);
+      }
+      @Override public V execute() throws Exception {
+        return Restlight.this.execute(request);
       }
       @Override public Request<V> request() {
         return request;
