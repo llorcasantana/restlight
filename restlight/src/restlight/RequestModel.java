@@ -2,12 +2,12 @@ package restlight;
 
 import java.util.concurrent.Executor;
 
-public class Performance {
+public class RequestModel {
 
   private HttpStack httpStack;
   private Executor executorDelivery;
   
-  public Performance() {
+  public RequestModel() {
     httpStack = new HttpUrlStack();
     executorDelivery = Platform.get();
   }

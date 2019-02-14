@@ -18,18 +18,18 @@ public class RequestQueue {
   private final BlockingQueue<Request<?>> networkQueue;
   
   /** Procesara las peticiones. */
-  private final Performance performance;
+  private final RequestModel model;
 
   /** Hilo que atendera la cola. */
   private final Thread[] dispatchers;
 
-  public RequestQueue(Performance performance, int threadPoolSize) {
+  public RequestQueue(RequestModel model, int threadPoolSize) {
     this.networkQueue = new LinkedBlockingQueue<Request<?>>();
-    this.performance = performance;
+    this.model = model;
     this.dispatchers = new Thread[threadPoolSize];
   }
   
-  public RequestQueue(Performance performance) {
+  public RequestQueue(RequestModel performance) {
     this(performance, DEFAULT_NETWORK_THREAD_POOL_SIZE);
   }
 
@@ -110,10 +110,10 @@ public class RequestQueue {
   }  
   
   public HttpStack stack() {
-    return performance.stack();
+    return model.stack();
   }
 
   public Executor executorDelivery() {
-    return performance.executorDelivery();
+    return model.executorDelivery();
   }  
 }

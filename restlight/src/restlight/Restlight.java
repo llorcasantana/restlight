@@ -8,7 +8,7 @@ public class Restlight {
   private static Restlight instance;
 
   /** Define el esquema. */
-  private final Performance performance;
+  private final RequestModel model;
   
   /** Procesa las peticiones a l servidor.  */
   private RequestQueue requestQueue;
@@ -16,7 +16,7 @@ public class Restlight {
 // TODO: Constructor...
 
   private Restlight() {
-    performance = new Performance();
+    model = new RequestModel();
   }
   
   public static Restlight getInstance() {
@@ -31,24 +31,24 @@ public class Restlight {
 // TODO: Funciones...
   
   public HttpStack getStack() {
-    return performance.stack();
+    return model.stack();
   }
   
   public void setStack(HttpStack stack) {
-    performance.setStack(stack);
+    model.setStack(stack);
   }
   
   public Executor getExecutorDelivery() {
-    return performance.executorDelivery();
+    return model.executorDelivery();
   }
   
   public void setExecutorDelivery(Executor executor) {
-    performance.setExecutorDelivery(executor);
+    model.setExecutorDelivery(executor);
   }
   
   public RequestQueue getQueue() {
     if (requestQueue == null) {
-      requestQueue = new RequestQueue(performance);
+      requestQueue = new RequestQueue(model);
       requestQueue.start();
     }
     return requestQueue;
