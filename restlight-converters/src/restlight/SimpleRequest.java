@@ -61,9 +61,9 @@ public class SimpleRequest<T> extends Request<T> {
     Adapter adapter = ADAPTERS.get(src.getClass());
     if (adapter == null) 
       adapter = defaultAdapter;
-    if (adapter == null) 
-      return setBody(new NoRequestBody(src));
-    else
+    if (adapter != null) 
       return setBody(adapter.adapter(src));
+    else
+      return setBody(new NoRequestBody(src));
   }
 }

@@ -25,7 +25,7 @@ public final class IOUtils {
       
       int maxBufferSize = 1024 * 1024;
       int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-      buffer = new byte[bufferSize];
+      buffer = POOL.getBuf(bufferSize);
       
       int count = in.read(buffer, 0, bufferSize);
       while (count > 0) {
@@ -35,6 +35,7 @@ public final class IOUtils {
         count = in.read(buffer, 0, bufferSize);
       }
     } finally {
+      POOL.returnBuf(buffer);
       closeQuietly(in);
     }
   }

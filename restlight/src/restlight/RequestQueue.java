@@ -17,20 +17,24 @@ public class RequestQueue {
   /** Cola de peticiones que se procesaran a la red. */
   private final BlockingQueue<Request<?>> networkQueue;
   
-  /** Procesara las peticiones. */
-  private final RequestModel model;
-
+  /** Procesara las peticiones a internet. */
+  private final HttpStack httpStack;
+  
   /** Hilo que atendera la cola. */
   private final Thread[] dispatchers;
 
-  public RequestQueue(RequestModel model, int threadPoolSize) {
-    this.networkQueue = new LinkedBlockingQueue<Request<?>>();
-    this.model = model;
-    this.dispatchers = new Thread[threadPoolSize];
+  /** Puente que comunica las tareas con el hilo principal. */
+  private Executor executorDelivery;
+
+  public RequestQueue(HttpStack stack, int threadPoolSize) {
+    networkQueue = new LinkedBlockingQueue<Request<?>>();
+    dispatchers = new Thread[threadPoolSize];
+    executorDelivery = Platform.get();
+    httpStack = stack;
   }
   
-  public RequestQueue(RequestModel performance) {
-    this(performance, DEFAULT_NETWORK_THREAD_POOL_SIZE);
+  public RequestQueue(HttpStack stack) {
+    this(stack, DEFAULT_NETWORK_THREAD_POOL_SIZE);
   }
 
   /**
@@ -110,10 +114,14 @@ public class RequestQueue {
   }  
   
   public HttpStack stack() {
-    return model.stack();
+    return httpStack;
   }
 
   public Executor executorDelivery() {
-    return model.executorDelivery();
-  }  
+    return executorDelivery;
+  }
+  
+  public void setExecutorDelivery(Executor executor) {
+    executorDelivery = executor;
+  }
 }

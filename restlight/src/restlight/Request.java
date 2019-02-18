@@ -5,15 +5,16 @@ import java.nio.charset.Charset;
 public abstract class Request<T> implements Callback<T> {
   /** Codificación predeterminada. */
   public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
-   
   /** Tiempo limite de espera por default. */
   public static final int DEFAULT_TIMEOUT = 2500 * 2 * 2;
+  /** Metodo por default. */
+  public static final String DEFAULT_METHOD = "GET";
   
   /** Url de nuestra request. */
   private String url;
   
   /** Metodo de la request: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE. */
-  private String method = "GET";
+  private String method = DEFAULT_METHOD;
   
   /** Lista de encabezados adicionales de HTTP para esta peticion. */
   private Headers headers;

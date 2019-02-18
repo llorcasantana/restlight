@@ -38,8 +38,8 @@ public class GsonRequest<T> extends Request<T> {
 
   @Override
   public T parseResponse(ResponseBody response) throws Exception {
-    //Reader json = response.charStream(getCharset());
-    String json = response.string(getCharset());
+    java.io.Reader json = response.charStream(getCharset());
+    //String json = response.string(getCharset());
     return gson.fromJson(json, classOf);
   }
 }

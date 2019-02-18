@@ -42,7 +42,8 @@ public class SimpleXmlRequest<T> extends Request<T> {
   
   @Override
   public T parseResponse(ResponseBody response) throws Exception {
-    T read = serializer.read(classOf, response.string(getCharset()), strict);
+    java.io.Reader xml = response.charStream(getCharset());
+    T read = serializer.read(classOf, xml, strict);
     if (read == null) {
       throw new IllegalStateException("Could not deserialize body as " + classOf);
     }

@@ -9,12 +9,12 @@ public interface Call<T> {
    * @param callback devolución de llamada
    */
   void execute(Callback<T> callback);
- 
-  /**     
-   * Envíe sincrónicamente la solicitud y devuelva su respuesta.
+  
+  /**
+   * Envía sincrónicamente la solicitud y devuelva su respuesta.
    */
   T execute() throws Exception;
-
+  
   /**
    * Devuelve la petición de la invocación del método.
    * @return petición

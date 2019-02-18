@@ -19,7 +19,7 @@ public class HttpUrlStack implements HttpStack {
    */
   public HttpURLConnection open(URL src) throws IOException {
     HttpURLConnection conn = (HttpURLConnection) src.openConnection();
-     // Workaround for the M release HttpURLConnection not observing the
+    // Workaround for the M release HttpURLConnection not observing the
     // HttpURLConnection.setFollowRedirects() property.
     // https://code.google.com/p/android/issues/detail?id=194495
     conn.setInstanceFollowRedirects(HttpURLConnection.getFollowRedirects());
@@ -142,8 +142,7 @@ public class HttpUrlStack implements HttpStack {
    *
    * @throws java.lang.Exception
    */
-  @Override
-  public ResponseBody execute(Request<?> request) throws IOException {
+  @Override public ResponseBody execute(Request<?> request) throws IOException {
     HttpURLConnection conn = null;
     try {
       conn = open(request);
@@ -153,7 +152,7 @@ public class HttpUrlStack implements HttpStack {
       writeHeaders(conn, request);
       writeBody(conn, request);
       return response(conn, request);
-      
+     
     } catch (IOException e) {
       if (conn != null) conn.disconnect();
       throw e;

@@ -1,22 +1,22 @@
 package restlight;
 
+import java.io.IOException;
 import java.util.concurrent.Executor;
 
-public class Restlight {
+public class Restlight implements HttpStack {
 
 // TODO: Varibles...
   private static Restlight instance;
 
-  /** Define el esquema. */
-  private final RequestModel model;
+  /** Procesara las peticiones a internet. */
+  private HttpStack httpStack;
   
-  /** Procesa las peticiones a l servidor.  */
+  /** Cola de peticiones al servidor. */
   private RequestQueue requestQueue;
-  
+ 
 // TODO: Constructor...
 
   private Restlight() {
-    model = new RequestModel();
   }
   
   public static Restlight getInstance() {
@@ -31,24 +31,27 @@ public class Restlight {
 // TODO: Funciones...
   
   public HttpStack getStack() {
-    return model.stack();
+    if (httpStack == null) {
+      httpStack = new HttpUrlStack();
+    }
+    return httpStack;
   }
   
   public void setStack(HttpStack stack) {
-    model.setStack(stack);
+    httpStack = stack;
   }
   
   public Executor getExecutorDelivery() {
-    return model.executorDelivery();
+    return getQueue().executorDelivery();
   }
   
   public void setExecutorDelivery(Executor executor) {
-    model.setExecutorDelivery(executor);
+    getQueue().setExecutorDelivery(executor);
   }
   
   public RequestQueue getQueue() {
     if (requestQueue == null) {
-      requestQueue = new RequestQueue(model);
+      requestQueue = new RequestQueue(this);
       requestQueue.start();
     }
     return requestQueue;
@@ -66,7 +69,7 @@ public class Restlight {
    * principal no sea bloqueada o interfiera con esta.
    * @param request petición a realizar
    */
-  public void queue(Request<?> request) {
+  public void enqueue(Request<?> request) {
     getQueue().add(request);
   }
   
@@ -78,8 +81,12 @@ public class Restlight {
    * @throws java.lang.Exception si se produjo un problema al hablar con el
    * servidor
    */
-  public <V> V execute(Request<V> request) throws Exception {
-    return getStack().execute(request).result(request);
+  public ResponseBody execute(Request<?> request) throws IOException {
+    return getStack().execute(request);
+  }
+  
+  public <V> V executeRequest(Request<V> request) throws Exception {
+    return execute(request).result(request);
   }
   
   /**
@@ -93,10 +100,10 @@ public class Restlight {
     return new Call<V>() {
       @Override public void execute(Callback<V> callback) {
         request.setCallback(callback);
-        Restlight.this.queue(request);
+        enqueue(request);
       }
       @Override public V execute() throws Exception {
-        return Restlight.this.execute(request);
+        return executeRequest(request);
       }
       @Override public Request<V> request() {
         return request;
