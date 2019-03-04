@@ -79,7 +79,7 @@ String run() throws Exception {
           .addParam("nombre", "Elizabéth Magaña")
           .addFile("img", new File("C:\\Users\\jesus\\Pictures\\420089-Kycb_1600x1200.jpg"));
     
-  Request request = new Request()
+  Request request = new Request();
   request.setUrl("http://127.0.0.1/test.php");
   request.setMethod("POST");
   request.setBody(body);
