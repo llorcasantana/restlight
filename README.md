@@ -64,7 +64,7 @@ String run() throws Exception {
 ```
 File run() throws Exception {
   String downloadPath = "C:\\Users\\Jesus\\Desktop\\restlight.jar";
-  Request.Parse request = new DownloadRequest(downloadPath);
+  Request.Parse<File> request = new DownloadRequest(downloadPath);
   request.setUrl("https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar");
   request.setMethod("GET");
 
