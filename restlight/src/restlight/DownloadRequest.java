@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import restlight.io.IOUtils;
 
-public class DownloadRequest extends Request<File> {
+public class DownloadRequest extends Request.Parse<File> {
 
   private final String mDownloadPath;
 

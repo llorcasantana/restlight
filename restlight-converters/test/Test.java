@@ -1,28 +1,33 @@
 
+import java.nio.charset.Charset;
 import restlight.Converter;
+import restlight.HttpRequest;
 import restlight.HttpUrlStack;
 import restlight.MultipartBody;
-import restlight.Request;
 import restlight.ResponseBody;
-import restlight.SimpleRequest;
 
 public class Test {
      
   static {
-    SimpleRequest.registerConverter(String.class, new StringConverter());
+    HttpRequest.registerConverter(String.class, new StringConverter());
   }
   
   public static class StringConverter implements Converter<String> {
     @Override
-    public String converter(ResponseBody body) throws Exception {
-      return body.string(Request.DEFAULT_ENCODING);
+    public String converter(ResponseBody body, Charset charset) throws Exception {
+      System.out.println("{code = " + body.code + "}");
+      System.out.println("{headers = " + body.headers.toString() + "}");
+      System.out.println("{contentLength = " + body.contentLength + "}");
+      System.out.println("{contentEncoding = " + body.contentEncoding + "}");
+      System.out.println("{contentType = " + body.contentType + "}");
+      return body.string(charset);
     }
   }
   
   public static void main(String[] args) throws Exception {  
     HttpUrlStack stack = new HttpUrlStack();
     
-    SimpleRequest<String> request = SimpleRequest.of(String.class);
+    HttpRequest<String> request = HttpRequest.of(String.class);
     request.setAction("POST", "http://127.0.0.1/test.php");
     
     MultipartBody body = new MultipartBody();

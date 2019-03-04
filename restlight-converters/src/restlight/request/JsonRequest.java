@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import restlight.Request;
 import restlight.ResponseBody;
 
-public abstract class JsonRequest<T> extends Request<T> {
+public abstract class JsonRequest<T> extends Request.Parse<T> {
 
   public static class Object extends JsonRequest<JSONObject> {
     @Override

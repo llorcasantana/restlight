@@ -34,7 +34,7 @@ public class ResponseBody implements Closeable {
     return new String(data, charset);
   }
   
-  <V> V result(Request<V> request) throws Exception {
+  <V> V result(Request.Parse<V> request) throws Exception {
     try { 
       return request.parseResponse(this);
     } finally {

@@ -30,7 +30,7 @@ public class Headers {
     return this;
   }
   
-  public String key(int index) {
+  public String name(int index) {
     return namesAndValues.get(index * 2);
   }
   
@@ -91,6 +91,10 @@ public class Headers {
   }
 
   @Override public String toString() {
-    return namesAndValues.toString();
+    StringBuilder result = new StringBuilder();
+    for (int i = 0, size = size(); i < size; i++) {
+      result.append(name(i)).append(": ").append(value(i)).append("\n");
+    }
+    return result.toString();
   }
 }

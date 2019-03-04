@@ -1,6 +1,6 @@
 package restlight;
 
-public class StringRequest extends Request<String> {
+public class StringRequest extends Request.Parse<String> {
 
   @Override
   public String parseResponse(ResponseBody response) throws Exception {

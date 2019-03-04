@@ -229,7 +229,7 @@ public class ImageLoader {
 
         // The request is not already in flight. Send the new request to the network and
         // track it.
-        Request<Bitmap> newRequest = makeImageRequest(requestUrl, maxWidth, maxHeight, scaleType,
+        Request.Parse<Bitmap> newRequest = makeImageRequest(requestUrl, maxWidth, maxHeight, scaleType,
                 cacheKey);
 
         mRequestQueue.add(newRequest);
@@ -238,7 +238,7 @@ public class ImageLoader {
         return imageContainer;
     }
 
-    protected Request<Bitmap> makeImageRequest(String requestUrl, int maxWidth, int maxHeight,
+    protected Request.Parse<Bitmap> makeImageRequest(String requestUrl, int maxWidth, int maxHeight,
             ScaleType scaleType, final String cacheKey) {
         return new ImageRequest(requestUrl, maxWidth, maxHeight, scaleType, Config.RGB_565) {
         	@Override
@@ -380,7 +380,7 @@ public class ImageLoader {
      */
     private class BatchedImageRequest {
         /** The request being tracked */
-        private final Request<?> mRequest;
+        private final Request.Parse<?> mRequest;
 
         /** The result of the request being tracked by this item */
         private Bitmap mResponseBitmap;
@@ -396,7 +396,7 @@ public class ImageLoader {
          * @param request The request being tracked
          * @param container The ImageContainer of the person who initiated the request.
          */
-        public BatchedImageRequest(Request<?> request, ImageContainer container) {
+        public BatchedImageRequest(Request.Parse<?> request, ImageContainer container) {
             mRequest = request;
             mContainers.add(container);
         }

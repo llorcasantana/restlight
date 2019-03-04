@@ -5,7 +5,7 @@ import org.simpleframework.xml.core.Persister;
 import restlight.Request;
 import restlight.ResponseBody;
 
-public class SimpleXmlRequest<T> extends Request<T> {
+public class SimpleXmlRequest<T> extends Request.Parse<T> {
 
   private final Serializer serializer;
   private final Class<T> classOf;

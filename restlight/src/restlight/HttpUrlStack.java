@@ -35,7 +35,7 @@ public class HttpUrlStack implements HttpStack {
    *
    * @throws java.io.IOException
    */
-  public HttpURLConnection open(Request<?> request) throws IOException {  
+  public HttpURLConnection open(Request request) throws IOException {  
     HttpURLConnection conn = open(new URL(request.getUrl()));
     conn.setConnectTimeout(request.getTimeoutMs());
     conn.setReadTimeout(request.getTimeoutMs());
@@ -52,13 +52,12 @@ public class HttpUrlStack implements HttpStack {
    *
    * @throws IOException
    */
-  public void writeHeaders(HttpURLConnection conn, Request<?> request)
+  public void writeHeaders(HttpURLConnection conn, Request request)
   throws IOException {
     Headers headers = request.getHeaders();
     if (headers != null) {
-      int len = headers.size();
-      for (int i = 0; i < len; i++) {
-        conn.addRequestProperty(headers.key(i), headers.value(i));
+      for (int i = 0, size = headers.size(); i < size; i++) {
+        conn.addRequestProperty(headers.name(i), headers.value(i));
       }
     }
   }
@@ -71,7 +70,7 @@ public class HttpUrlStack implements HttpStack {
    *
    * @throws IOException
    */
-  public void writeBody(HttpURLConnection conn, Request<?> request) 
+  public void writeBody(HttpURLConnection conn, Request request) 
   throws IOException {
     String method = request.getMethod();
     conn.setRequestMethod(method);
@@ -91,7 +90,7 @@ public class HttpUrlStack implements HttpStack {
    *
    * @throws java.io.IOException
    */
-  public void writeTo(HttpURLConnection conn, Request<?> request) throws IOException {
+  public void writeTo(HttpURLConnection conn, Request request) throws IOException {
     RequestBody requestBody = request.getBody();
     if (requestBody != null) {
       // Setup connection:
@@ -114,7 +113,7 @@ public class HttpUrlStack implements HttpStack {
     }
   }
   
-  public ResponseBody response(HttpURLConnection conn, Request<?> request) 
+  public ResponseBody response(HttpURLConnection conn, Request request) 
   throws IOException {
     int responseCode = conn.getResponseCode();
     if (responseCode == -1) {
@@ -142,7 +141,7 @@ public class HttpUrlStack implements HttpStack {
    *
    * @throws java.lang.Exception
    */
-  @Override public ResponseBody execute(Request<?> request) throws IOException {
+  @Override public ResponseBody execute(Request request) throws IOException {
     HttpURLConnection conn = null;
     try {
       conn = open(request);

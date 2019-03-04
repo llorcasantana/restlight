@@ -2,7 +2,7 @@ package restlight;
 
 import java.util.HashMap;
 
-public class SimpleRequest<T> extends Request<T> { 
+public class HttpRequest<T> extends Request.Parse<T> { 
 
   public static final HashMap<Class<?>, Adapter<?>> ADAPTERS;
   public static final HashMap<Class<?>, Converter<?>> CONVERTERS;
@@ -23,22 +23,22 @@ public class SimpleRequest<T> extends Request<T> {
     CONVERTERS.put(classOf, converter);
   }
   
-  public static <V> SimpleRequest<V> of(Converter<V> converter) {
-    return new SimpleRequest<V>(converter);
+  public static <V> HttpRequest<V> of(Converter<V> converter) {
+    return new HttpRequest<V>(converter);
   }
 
-  public static <V> SimpleRequest<V> of(Class<V> classOf) {
+  public static <V> HttpRequest<V> of(Class<V> classOf) {
      Converter converter = CONVERTERS.get(classOf);
      return (converter == null) ? of(defaultConverter) : of(converter);
   }
   
   private final Converter<T> converter;
 
-  private SimpleRequest(Converter<T> converter) {
+  private HttpRequest(Converter<T> converter) {
     this.converter = converter;
   }
 
-  public SimpleRequest() {
+  public HttpRequest() {
     this(null);
   }
   
@@ -50,20 +50,21 @@ public class SimpleRequest<T> extends Request<T> {
     if (converter == null) {
       throw new UnsupportedOperationException("converter not supported yet.");
     }
-    return converter.converter(response);
+    return converter.converter(response, getCharset());
   }
   
-  public Request<T> setAction(String method, String url) {
-    return setMethod(method).setUrl(url);
+  public void setAction(String method, String url) {
+    setMethod(method);
+    setUrl(url);
   }
   
-  public Request<T> setBody(Object src) {
+  public void setBody(Object src) {
     Adapter adapter = ADAPTERS.get(src.getClass());
     if (adapter == null) 
       adapter = defaultAdapter;
     if (adapter != null) 
-      return setBody(adapter.adapter(src));
+      setBody(adapter.adapter(src));
     else
-      return setBody(new NoRequestBody(src));
+      setBody(new NoRequestBody(src));
   }
 }

@@ -1,10 +1,9 @@
 package com.jx;
 
-import restlight.HttpUrlStack;
 import restlight.HttpUrl;
+import restlight.HttpUrlStack;
 import restlight.Request;
 import restlight.ResponseBody;
-import restlight.StringRequest;
 
 public class Delete {
 
@@ -15,12 +14,12 @@ public class Delete {
             .setUrl("http://127.0.0.1/test.php")
             .addQueryParameter("id", 101010);
 
-    Request<String> request = new StringRequest()
-            .setUrl(url)
-            .setMethod("DELETE");
+    Request request = new Request();
+    request.setUrl(url); 
+    request.setMethod("DELETE");
 
     try (ResponseBody response = stack.execute(request)) {
-      return request.parseResponse(response);
+      return response.string(request.getCharset());
     }
   }
 

@@ -2,7 +2,7 @@ package restlight;
 
 import java.nio.charset.Charset;
 
-public abstract class Request<T> implements Callback<T> {
+public class Request {
   /** Codificación predeterminada. */
   public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
   /** Tiempo limite de espera por default. */
@@ -27,25 +27,12 @@ public abstract class Request<T> implements Callback<T> {
   
   /** Codificacion. */
   private Charset charset = DEFAULT_ENCODING;
-    
-  /** Intefaz que escuchara la respuesta.*/
-  private Callback<T> callback;
-   
+  
+  /** Etiqueta para identificar la request. */ 
   private Object tag = Request.class;
   
   /** Valida si la request fue cancelada. */
-  private boolean isCanceled;
-
-  /**
-   * Convercion de la respuesta obtenida de la Red.
-   *
-   * @param response resultado obtenido.
-   *
-   * @return tipo generico
-   *
-   * @throws java.lang.Exception
-   */
-  public abstract T parseResponse(ResponseBody response) throws Exception;
+  protected boolean isCanceled;
 
   /**
    * @return true si se cancelo la peticion.
@@ -62,99 +49,116 @@ public abstract class Request<T> implements Callback<T> {
   public void cancel() {
     synchronized (this) {
       isCanceled = true;
-      callback = null;
     }
-  }
-
-  /**
-   * Livera la respuesta por la Interfaz.
-   *
-   * @param result resultado obtenido
-   *
-   * @throws java.lang.Exception
-   */
-  @Override public void onResponse(T result) throws Exception {
-    if (callback != null) callback.onResponse(result);
-  }
-
-  /**
-   * Livera el error por la Interfaz.
-   *
-   * @param error ocurrido
-   */
-  @Override public void onFailure(Exception error) {
-    if (callback != null) callback.onFailure(error);
   }
 
   public String getUrl() {
     return url;
   }
-  public Request<T> setUrl(String url) {
+  public void setUrl(String url) {
     this.url = url;
-    return this;
   }
-  public Request<T> setUrl(HttpUrl url) {
-    return setUrl(url.toString(getCharset()));
+  public void setUrl(HttpUrl url) {
+    setUrl(url.toString(getCharset()));
   }
    
   public String getMethod() {
     return method;
   }
-  public Request<T> setMethod(String method) {
+  public void setMethod(String method) {
     this.method = method;
-    return this;
   }
   
   public Headers getHeaders() {
     return headers;
   }
-  public Request<T> setHeaders(Headers headers) {
+  public void setHeaders(Headers headers) {
     this.headers = headers;
-    return this;
   }
-  public Request<T> header(String key, String value) {
+  public void header(String key, String value) {
     if (headers == null) headers = new Headers();
     headers.add(key, value);
-    return this;
   }
 
   public RequestBody getBody() {
     return body;
   }
-  public Request<T> setBody(RequestBody body) {
+  public void setBody(RequestBody body) {
     this.body = body;
-    return this;
   }
   
   public int getTimeoutMs() {
     return timeoutMs;
   }
-  public Request<T> setTimeoutMs(int timeoutMs) {
+  public void setTimeoutMs(int timeoutMs) {
     this.timeoutMs = timeoutMs;
-    return this;
   }
 
   public Charset getCharset() {
     return charset;
   }
-  public Request<T> setCharset(Charset charset) {
+  public void setCharset(Charset charset) {
     this.charset = charset;
-    return this;
   }
 
-  public Callback<T> getCallback() {
-    return callback;
-  }
-  public Request<T> setCallback(Callback<T> callback) {
-    this.callback = callback;
-    return this;
-  }
   
   public Object getTag() {
     return tag;
   }
-  public Request<T> setTag(Object tag) {
+  public void setTag(Object tag) {
     this.tag = tag;
-    return this;
+  }
+  
+  
+  public static abstract class Parse<T> extends Request implements Callback<T> {
+    /** Intefaz que escuchara la respuesta. */
+    private Callback<T> callback;
+
+    /**
+     * Convercion de la respuesta obtenida de la Red.
+     *
+     * @param response resultado obtenido.
+     *
+     * @return tipo generico
+     *
+     * @throws java.lang.Exception
+     */
+    public abstract T parseResponse(ResponseBody response) throws Exception;
+
+    public Callback<T> getCallback() {
+      return callback;
+    }
+
+    public void setCallback(Callback<T> callback) {
+      this.callback = callback;
+    }
+    
+    /**
+     * Livera la respuesta por la Interfaz.
+     *
+     * @param result resultado obtenido
+     *
+     * @throws java.lang.Exception
+     */
+    @Override public void onResponse(T result) throws Exception {
+      if (callback != null)  callback.onResponse(result);
+    }
+
+    /**
+     * Livera el error por la Interfaz.
+     *
+     * @param error ocurrido
+     */
+    @Override public void onFailure(Exception error) {
+      if (callback != null) callback.onFailure(error);
+    }
+    
+    /** Cancela la peticion. */
+    @Override public void cancel() {
+      synchronized (this) {
+        isCanceled = true;
+        callback = null;
+      }
+    }
   }
 }

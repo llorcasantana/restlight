@@ -34,7 +34,7 @@ public class RequestDispatcher extends Thread {
   @Override public void run() {
     /*Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);*/
     while (true) {
-      Request<?> request;
+      Request.Parse<?> request;
       try {
         // Toma y quita la peticion de la cola.
         request = queue.networkQueue().take();

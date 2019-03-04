@@ -7,7 +7,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView.ScaleType;
 
-public class ImageRequest extends Request<Bitmap> {
+public class ImageRequest extends Request.Parse<Bitmap> {
     private final Config mDecodeConfig;
     private final int mMaxWidth;
     private final int mMaxHeight;

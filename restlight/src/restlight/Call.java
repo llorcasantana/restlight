@@ -19,7 +19,7 @@ public interface Call<T> {
    * Devuelve la petición de la invocación del método.
    * @return petición
    */
-  Request<T> request();
+  Request.Parse<T> request();
   
   /**
    * Cancele esta llamada. 

@@ -78,9 +78,8 @@ public class MultipartBody extends RequestBody {
       out.write(CR_LF);
 
       // Write Format Multipart Header:
-      int len = part.headers.size();
-      for (int i = 0; i < len; i++) {
-        out.write(part.headers.key(i).getBytes(charset));
+      for (int i = 0, size = part.headers.size(); i < size; i++) {
+        out.write(part.headers.name(i).getBytes(charset));
         out.write(COLON_SPACE);
         out.write(part.headers.value(i).getBytes(charset));
         out.write(CR_LF);

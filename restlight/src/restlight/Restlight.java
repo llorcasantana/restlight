@@ -24,7 +24,7 @@ public class Restlight implements HttpStack {
     return instance;
   }
   
-  public static <V> Call<V> fromCall(Request<V> request) {
+  public static <V> Call<V> fromCall(Request.Parse<V> request) {
     return Restlight.getInstance().newCall(request);
   }
 
@@ -69,7 +69,7 @@ public class Restlight implements HttpStack {
    * principal no sea bloqueada o interfiera con esta.
    * @param request petición a realizar
    */
-  public void enqueue(Request<?> request) {
+  public void enqueue(Request.Parse<?> request) {
     getQueue().add(request);
   }
   
@@ -81,11 +81,11 @@ public class Restlight implements HttpStack {
    * @throws java.lang.Exception si se produjo un problema al hablar con el
    * servidor
    */
-  public ResponseBody execute(Request<?> request) throws IOException {
+  public ResponseBody execute(Request request) throws IOException {
     return getStack().execute(request);
   }
   
-  public <V> V executeRequest(Request<V> request) throws Exception {
+  public <V> V executeRequest(Request.Parse<V> request) throws Exception {
     return execute(request).result(request);
   }
   
@@ -96,7 +96,7 @@ public class Restlight implements HttpStack {
    * @param request petición a realizar
    * @return una llamada
    */
-  public <V> Call<V> newCall(final Request<V> request) {
+  public <V> Call<V> newCall(final Request.Parse<V> request) {
     return new Call<V>() {
       @Override public void execute(Callback<V> callback) {
         request.setCallback(callback);
@@ -105,7 +105,7 @@ public class Restlight implements HttpStack {
       @Override public V execute() throws Exception {
         return executeRequest(request);
       }
-      @Override public Request<V> request() {
+      @Override public Request.Parse<V> request() {
         return request;
       }
       @Override public void cancel() {

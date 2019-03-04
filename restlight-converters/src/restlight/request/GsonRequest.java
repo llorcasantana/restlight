@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import restlight.Request;
 import restlight.ResponseBody;
 
-public class GsonRequest<T> extends Request<T> {
+public class GsonRequest<T> extends Request.Parse<T> {
 
   private final Gson gson;
   private final Class<T> classOf;

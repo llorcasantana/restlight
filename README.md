@@ -7,34 +7,19 @@ Restlight es una librería **HTTP** para Android y Java, que facilita la creaci�
 Creamos un objeto para ejecutar las request.  
 Envíe sincrónicamente la solicitud y devuelva su respuesta.
 ```
-HttpUrlStack stack = new HttpUrlStack();
-```
-
-### Basic POST
-```
-StringRequest request = new StringRequest();
-request.setMethod("POST");
-request.setUrl("http://www.example.com");
-    
-FormBody body = new FormBody();
-body.add("username", "John");
-body.add("password", "pass");
-request.setBody(body);
-    
-ResponseBody response = stack.execute(request);
-System.out.println(request.parseResponse(response));
+Restlight rest = Restlight.getInstance();
 ```
 
 ### GET
 ```
 String run() throws Exception {
   String url = "http://weather.livedoor.com/forecast/webservice/json/v1?city=130010";
-  Request<String> request = new StringRequest()
-          .setUrl(url)
-          .setMethod("GET");
+  Request request = new Request();
+  request.setUrl(url);
+  request.setMethod("GET");
 
-  try (ResponseBody response = stack.execute(request)) {
-    return request.parseResponse(response);
+  try (ResponseBody response = rest.execute(request)) {
+    return response.string(request.getCharset());
   }
 }
 ```
@@ -47,13 +32,13 @@ String run() throws Exception {
           .add("edad", 22)
           .add("soltera", false);
     
-  Request<String> request = new StringRequest()
-          .setUrl("http://127.0.0.1/test.php")
-          .setMethod("POST")
-          .setBody(body);
+  Request request = new Request();
+  request.setUrl("http://127.0.0.1/test.php");
+  request.setMethod("POST");
+  request.setBody(body);
 
-  try (ResponseBody response = stack.execute(request)) {
-    return request.parseResponse(response);
+  try (ResponseBody response = rest.execute(request)) {
+    return response.string(request.getCharset());
   }
 }
 ```
@@ -65,12 +50,12 @@ String run() throws Exception {
           .setUrl("http://127.0.0.1/test.php")
           .addQueryParameter("id", 101010);
 
-  Request<String> request = new StringRequest()
-          .setUrl(url)
-          .setMethod("DELETE");
+  Request request = new Request();
+  request.setUrl(url);
+  request.setMethod("DELETE");
 
-  try (ResponseBody response = stack.execute(request)) {
-    return request.parseResponse(response);
+  try (ResponseBody response = rest.execute(request)) {
+    return response.string(request.getCharset());
   }
 }
 ```
@@ -79,13 +64,11 @@ String run() throws Exception {
 ```
 File run() throws Exception {
   String downloadPath = "C:\\Users\\Jesus\\Desktop\\restlight.jar";
-  Request<File> request = new DownloadRequest(downloadPath)
-          .setUrl("https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar")
-          .setMethod("GET");
+  Request.Parse request = new DownloadRequest(downloadPath);
+  request.setUrl("https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar");
+  request.setMethod("GET");
 
-  try (ResponseBody response = stack.execute(request)) {
-    return request.parseResponse(response);
-  }
+  return rest.executeRequest(request);
 }
 ```
 
@@ -96,10 +79,10 @@ String run() throws Exception {
           .addParam("nombre", "Elizabéth Magaña")
           .addFile("img", new File("C:\\Users\\jesus\\Pictures\\420089-Kycb_1600x1200.jpg"));
     
-  Request<String> request = new StringRequest()
-          .setUrl("http://127.0.0.1/test.php")
-          .setMethod("POST")
-          .setBody(body);
+  Request request = new Request()
+  request.setUrl("http://127.0.0.1/test.php");
+  request.setMethod("POST");
+  request.setBody(body);
 
   try (ResponseBody response = stack.execute(request)) {
     return request.parseResponse(response);
@@ -159,9 +142,9 @@ public class Dao {
   }
 
   public Call<Post[]> getPosts() {
-    Request<Post[]> request = GsonRequest.of(gson, Post[].class)
-            .setUrl("https://kylewbanks.com/rest/posts.json")
-            .setMethod("GET");
+    Request.Parse<Post[]> request = GsonRequest.of(gson, Post[].class);
+    request.setUrl("https://kylewbanks.com/rest/posts.json");
+    request.setMethod("GET");
     
     return restlight.newCall(request);
   }
