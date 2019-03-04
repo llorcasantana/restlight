@@ -85,7 +85,7 @@ String run() throws Exception {
   request.setBody(body);
 
   try (ResponseBody response = rest.execute(request)) {
-    return request.parseResponse(response);
+    return response.string(request.getCharset());
   }
 }
 ```
