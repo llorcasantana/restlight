@@ -84,7 +84,7 @@ String run() throws Exception {
   request.setMethod("POST");
   request.setBody(body);
 
-  try (ResponseBody response = stack.execute(request)) {
+  try (ResponseBody response = rest.execute(request)) {
     return request.parseResponse(response);
   }
 }
