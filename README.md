@@ -7,7 +7,7 @@ Restlight es una librería **HTTP** para Android y Java, que facilita la creaci�
 Creamos un objeto para ejecutar las request.  
 Envíe sincrónicamente la solicitud y devuelva su respuesta.
 ```
-Restlight rest = Restlight.getInstance();
+Restlight rest = Restlight.get();
 ```
 
 ### GET
@@ -138,7 +138,7 @@ public class Dao {
         .setDateFormat("M/d/yy hh:mm a")
         .create();
 
-    restlight = Restlight.getInstance();
+    restlight = Restlight.get();
   }
 
   public Call<Post[]> getPosts() {
