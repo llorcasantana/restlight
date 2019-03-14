@@ -22,7 +22,7 @@ public class PostDao {
             .setDateFormat("M/d/yy hh:mm a")
             .create();
 
-    restlight = Restlight.getInstance();
+    restlight = Restlight.get();
   }
 
   public Call<Post[]> getPosts() {

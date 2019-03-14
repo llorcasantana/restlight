@@ -11,28 +11,28 @@ public class Request {
   public static final String DEFAULT_METHOD = "GET";
   
   /** Url de nuestra request. */
-  private String url;
+  String url;
   
   /** Metodo de la request: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE. */
-  private String method = DEFAULT_METHOD;
+  String method = DEFAULT_METHOD;
   
   /** Lista de encabezados adicionales de HTTP para esta peticion. */
-  private Headers headers;
+  Headers headers;
  
   /** Parametros de nuestra request. */
-  private RequestBody body;
+  RequestBody body;
   
   /** Tiempo limite de espera. */
-  private int timeoutMs = DEFAULT_TIMEOUT;
+  int timeoutMs = DEFAULT_TIMEOUT;
   
   /** Codificacion. */
-  private Charset charset = DEFAULT_ENCODING;
+  Charset charset = DEFAULT_ENCODING;
   
   /** Etiqueta para identificar la request. */ 
-  private Object tag = Request.class;
+  Object tag = Request.class;
   
   /** Valida si la request fue cancelada. */
-  protected boolean isCanceled;
+  boolean isCanceled;
 
   /**
    * @return true si se cancelo la peticion.
@@ -75,9 +75,9 @@ public class Request {
   public void setHeaders(Headers headers) {
     this.headers = headers;
   }
-  public void header(String key, String value) {
+  public void addHeader(String name, String value) {
     if (headers == null) headers = new Headers();
-    headers.add(key, value);
+    headers.add(name, value);
   }
 
   public RequestBody getBody() {
@@ -113,7 +113,7 @@ public class Request {
   public static abstract class Parse<T> extends Request implements Callback<T> {
     /** Intefaz que escuchara la respuesta. */
     private Callback<T> callback;
-
+    
     /**
      * Convercion de la respuesta obtenida de la Red.
      *
@@ -128,7 +128,6 @@ public class Request {
     public Callback<T> getCallback() {
       return callback;
     }
-
     public void setCallback(Callback<T> callback) {
       this.callback = callback;
     }
@@ -159,6 +158,17 @@ public class Request {
         isCanceled = true;
         callback = null;
       }
+    }
+    
+    public void setRequest(Request r) {
+      url = r.url;
+      method = r.method;
+      headers = r.headers;
+      body = r.body;
+      timeoutMs = r.timeoutMs;
+      charset = r.charset;
+      tag = r.tag;
+      isCanceled = r.isCanceled;
     }
   }
 }

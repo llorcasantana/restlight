@@ -19,13 +19,9 @@ public class Restlight implements HttpStack {
   private Restlight() {
   }
   
-  public static Restlight getInstance() {
+  public static Restlight get() {
     if (instance == null) instance = new Restlight();
     return instance;
-  }
-  
-  public static <V> Call<V> fromCall(Request.Parse<V> request) {
-    return Restlight.getInstance().newCall(request);
   }
 
 // TODO: Funciones...
@@ -115,5 +111,10 @@ public class Restlight implements HttpStack {
         return request.isCanceled();
       }
     };
+  }
+  
+  public <V> Call<V> newCall(Request request, Request.Parse<V> parse) {
+    parse.setRequest(request);
+    return newCall(parse);
   }
 }
