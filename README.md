@@ -131,14 +131,11 @@ Definimos las interacciones de la base de datos. Pueden incluir una variedad de 
 ```
 public class Dao {
   private Gson gson;
-  private Restlight restlight;
     
   public Dao() {
     gson = new GsonBuilder()
         .setDateFormat("M/d/yy hh:mm a")
         .create();
-
-    restlight = Restlight.get();
   }
 
   public Call<Post[]> getPosts() {
@@ -146,6 +143,7 @@ public class Dao {
     request.setUrl("https://kylewbanks.com/rest/posts.json");
     request.setMethod("GET");
     
+    Restlight restlight = Restlight.get();
     return restlight.newCall(request);
   }
 }
