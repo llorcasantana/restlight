@@ -1,31 +1,18 @@
 Programa la solicitud para ser ejecutada en segundo plano. Ideal para aplicaciones android. 
 Envía de manera asíncrona la petición y notifica a tu aplicación con un callback cuando una respuesta regresa.
 ```
-import restlight.Converter;
-import restlight.HttpUrlStack;
+import restlight.Call;
 import restlight.MultipartBody;
 import restlight.Request;
-import restlight.ResponseBody;
-import restlight.SimpleRequest;
+import restlight.Restlight;
+import restlight.StringRequest;
 
 public class Test {
      
-  static {
-    SimpleRequest.registerConverter(String.class, new StringConverter());
-  }
-  
-  public static class StringConverter implements Converter<String> {
-    @Override
-    public String converter(ResponseBody body) throws Exception {
-      return body.string(Request.DEFAULT_ENCODING);
-    }
-  }
-  
   public static void main(String[] args) throws Exception {  
-    HttpUrlStack stack = new HttpUrlStack();
-    
-    SimpleRequest<String> request = SimpleRequest.of(String.class);
-    request.setAction("POST", "http://127.0.0.1/test.php");
+    Request request = new Request();
+    request.setMethod("POST");
+    request.setUrl("http://127.0.0.1/test.php");
     
     MultipartBody body = new MultipartBody();
     body.addParam("first", "Jesus");
@@ -33,8 +20,12 @@ public class Test {
     body.addFile("archivo", new byte[]{'H', 'O', 'L', 'A', ' ', 'M', 'U', 'N', 'D', 'O'}, "texto.txt");
     request.setBody(body);
     
-    ResponseBody response = stack.execute(request);
-    System.out.println(request.parseResponse(response));
+    Restlight restlight = Restlight.get();
+    Request.Parse<String> parse = new StringRequest();
+    Call<String> call = restlight.newCall(request, parse); 
+    
+    String data = call.execute();
+    System.out.println(data);
   }
 }
 ```
