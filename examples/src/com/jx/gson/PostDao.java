@@ -15,14 +15,11 @@ import restlight.request.GsonRequest;
 
 public class PostDao {
   Gson gson;
-  Restlight restlight;
 
   public PostDao() {
     gson = new GsonBuilder()
             .setDateFormat("M/d/yy hh:mm a")
             .create();
-
-    restlight = Restlight.get();
   }
 
   public Call<Post[]> getPosts() {
@@ -30,6 +27,7 @@ public class PostDao {
     request.setUrl("https://kylewbanks.com/rest/posts.json");
     request.setMethod("GET");
 
+    Restlight restlight = Restlight.get();
     return restlight.newCall(request);
   }
   
@@ -41,6 +39,7 @@ public class PostDao {
     request.setUrl("http://127.0.0.1/test.php");
     request.setBody(body);
     
+    Restlight restlight = Restlight.get();
     return restlight.newCall(request);
   }
 

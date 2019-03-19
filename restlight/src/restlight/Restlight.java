@@ -63,6 +63,7 @@ public class Restlight implements HttpStack {
    * callback cuando una respuesta regresa. Ya que esta petición es asíncrona,
    * la ejecución se maneja en un hilo de fondo para que el hilo de la UI
    * principal no sea bloqueada o interfiera con esta.
+   * 
    * @param request petición a realizar
    */
   public void enqueue(Request.Parse<?> request) {
@@ -71,25 +72,33 @@ public class Restlight implements HttpStack {
   
   /**
    * Envíe sincrónicamente la solicitud y devuelva su respuesta.
-   * @param <V> tipo de petición
+   * 
    * @param request petición a realizar
+   * 
    * @return una respuesta para el tipo de petición realizada
+   * 
    * @throws java.lang.Exception si se produjo un problema al hablar con el
    * servidor
    */
   public ResponseBody execute(Request request) throws IOException {
     return getStack().execute(request);
   }
+
+  public <V> V execute(Request.Parse<V> parse) throws Exception {
+    return execute((Request)parse).result(parse);
+  }
   
-  public <V> V executeRequest(Request.Parse<V> request) throws Exception {
-    return execute(request).result(request);
+  public <V> V execute(Request request, Request.Parse<V> parse) throws Exception {
+    parse.setRequest(request);
+    return execute(parse);
   }
   
   /**
    * Crea una invocación de un método que envía una solicitud a un servidor web 
    * y devuelve una respuesta.
-   * @param <V> tipo de petición
+   * 
    * @param request petición a realizar
+   * 
    * @return una llamada
    */
   public <V> Call<V> newCall(final Request.Parse<V> request) {
@@ -99,7 +108,7 @@ public class Restlight implements HttpStack {
         enqueue(request);
       }
       @Override public V execute() throws Exception {
-        return executeRequest(request);
+        return Restlight.this.execute(request);
       }
       @Override public Request.Parse<V> request() {
         return request;

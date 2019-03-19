@@ -24,8 +24,16 @@ public class Headers {
     return namesAndValues.size() / 2;
   }
   
-  public Headers add(String key, String value) {
-    namesAndValues.add(key);
+  public Headers add(String name, String value) {
+    // Check for malformed headers.
+    if (name == null) throw new NullPointerException("name == null");
+    if (name.isEmpty()) throw new IllegalArgumentException("name is empty");
+    if (value == null) throw new NullPointerException("value for name " + name + " == null");
+    if (name.indexOf('\0') != -1 || value.indexOf('\0') != -1) {
+      throw new IllegalArgumentException("Unexpected header: " + name + ": " + value);
+    }
+    
+    namesAndValues.add(name);
     namesAndValues.add(value);
     return this;
   }
@@ -74,16 +82,9 @@ public class Headers {
 
     Headers headers = new Headers(namesAndValues.length / 2);
     
-    // Check for malformed headers.
     for (int i = 0; i < namesAndValues.length; i += 2) {
       String name = namesAndValues[i];
       String value = namesAndValues[i + 1];
-      if (name == null || value == null) {
-        throw new IllegalArgumentException("Headers cannot be null");
-      }
-      if (name.length() == 0 || name.indexOf('\0') != -1 || value.indexOf('\0') != -1) {
-        throw new IllegalArgumentException("Unexpected header: " + name + ": " + value);
-      }
       headers.add(name, value);
     }
 

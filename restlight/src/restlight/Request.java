@@ -5,8 +5,10 @@ import java.nio.charset.Charset;
 public class Request {
   /** Codificación predeterminada. */
   public static final Charset DEFAULT_ENCODING = Charset.forName("utf-8");
+
   /** Tiempo limite de espera por default. */
   public static final int DEFAULT_TIMEOUT = 2500 * 2 * 2;
+  
   /** Metodo por default. */
   public static final String DEFAULT_METHOD = "GET";
   

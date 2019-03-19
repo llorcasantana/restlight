@@ -1,7 +1,9 @@
 package restlight;
 
 import java.io.BufferedOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import restlight.io.IOUtils;
@@ -113,7 +115,7 @@ public class HttpUrlStack implements HttpStack {
     }
   }
   
-  public ResponseBody response(HttpURLConnection conn, Request request) 
+  public ResponseBody newResponse(HttpURLConnection conn, Request request) 
   throws IOException {
     int responseCode = conn.getResponseCode();
     if (responseCode == -1) {
@@ -128,8 +130,23 @@ public class HttpUrlStack implements HttpStack {
     response.contentLength = conn.getContentLength();
     response.contentEncoding = conn.getContentEncoding();
     response.contentType = conn.getContentType();
-    response.inputStream = IOUtils.inputStream(conn);
+    response.inputStream = inputStream(conn);
     return response;
+  }
+  
+  static InputStream inputStream(final HttpURLConnection hurlc) {
+    InputStream inputStream;
+    try {
+      inputStream = hurlc.getInputStream();
+    } catch(IOException e) {
+      inputStream = hurlc.getErrorStream();
+    }
+    return new FilterInputStream(inputStream) {
+      @Override public void close() {
+        IOUtils.closeQuietly(in);
+        hurlc.disconnect();
+      }
+    };
   }
   
   /**
@@ -150,7 +167,7 @@ public class HttpUrlStack implements HttpStack {
       
       writeHeaders(conn, request);
       writeBody(conn, request);
-      return response(conn, request);
+      return newResponse(conn, request);
      
     } catch (IOException e) {
       if (conn != null) conn.disconnect();

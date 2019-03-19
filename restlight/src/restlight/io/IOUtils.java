@@ -3,11 +3,9 @@ package restlight.io;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 
 public final class IOUtils {
 
@@ -58,21 +56,6 @@ public final class IOUtils {
   }
   public static PoolingByteArrayOutputStream arrayOutputStream(int size) {
     return new PoolingByteArrayOutputStream(POOL, size);
-  }
-  
-  public static InputStream inputStream(final HttpURLConnection hurlc) {
-    InputStream inputStream;
-    try {
-      inputStream = hurlc.getInputStream();
-    } catch(IOException e) {
-      inputStream = hurlc.getErrorStream();
-    }
-    return new FilterInputStream(inputStream) {
-      @Override public void close() {
-        IOUtils.closeQuietly(in);
-        hurlc.disconnect();
-      }
-    };
   }
   
   public static byte[] toByteArray(InputStream source) throws IOException {

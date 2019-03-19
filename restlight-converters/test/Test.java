@@ -1,11 +1,12 @@
 
-import restlight.Call;
 import restlight.MultipartBody;
 import restlight.Request;
 import restlight.Restlight;
-import restlight.StringRequest;
+import restlight.json.JSON;
+import restlight.request.JsonRequest;
 
 public class Test {   
+   
   
   public static void main(String[] args) throws Exception { 
     Request request = new Request();
@@ -18,11 +19,10 @@ public class Test {
     body.addFile("archivo", new byte[]{'H', 'O', 'L', 'A', ' ', 'M', 'U', 'N', 'D', 'O'}, "texto.txt");
     request.setBody(body);
     
-    Restlight restlight = Restlight.get();
-    Request.Parse<String> parse = new StringRequest();
-    Call<String> call = restlight.newCall(request, parse); 
+    Restlight rest = Restlight.get();
+    Request.Parse<JSON> parse = new JsonRequest();
     
-    String data = call.execute();
-    System.out.println(data);
+    JSON json = rest.execute(request, parse);
+    System.out.println(json.toString(1));
   }
 }
