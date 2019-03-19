@@ -68,7 +68,7 @@ File run() throws Exception {
   request.setUrl("https://github.com/JesusBetaX/Restlight/raw/master/dist/restlight.jar");
   request.setMethod("GET");
 
-  return rest.executeRequest(request);
+  return rest.execute(request);
 }
 ```
 
