@@ -11,7 +11,7 @@ Restlight rest = Restlight.get();
 ```
 
 ### GET
-```
+```java
 String run() throws Exception {
   String url = "http://weather.livedoor.com/forecast/webservice/json/v1?city=130010";
   Request request = new Request();
@@ -25,7 +25,7 @@ String run() throws Exception {
 ```
 
 ### POST
-```
+```java
 String run() throws Exception {
   FormBody body = new FormBody()
           .add("nombre", "Elizabéth Magaña")
@@ -44,7 +44,7 @@ String run() throws Exception {
 ```
 
 ### DELETE
-```
+```java
 String run() throws Exception {
   HttpUrl url = new HttpUrl()
           .setUrl("http://127.0.0.1/test.php")
@@ -61,7 +61,7 @@ String run() throws Exception {
 ```
 
 ### DOWLOAD
-```
+```java
 File run() throws Exception {
   String downloadPath = "C:\\Users\\Jesus\\Desktop\\restlight.jar";
   Request.Parse<File> request = new DownloadRequest(downloadPath);
@@ -73,7 +73,7 @@ File run() throws Exception {
 ```
 
 ### UPLOAD
-```
+```java
 String run() throws Exception { 
   MultipartBody body = new MultipartBody()
           .addParam("nombre", "Elizabéth Magaña")
@@ -107,7 +107,7 @@ dependencies {
 Ahora estamos listos para comenzar a escribir un código. Lo primero que querremos hacer es definir nuestro modelo **Post**
 Cree un nuevo archivo llamado **Post.java** y defina la clase **Post** de esta manera:
 
-```
+```java
 public class Post {
   
   @SerializedName("id")
@@ -128,7 +128,7 @@ Creemos una nueva instancia de **GSON** antes de llamar a la request. También n
 
 Definimos las interacciones de la base de datos. Pueden incluir una variedad de métodos de consulta.:
 
-```
+```java
 public class Dao {
   private Gson gson;
     
@@ -151,7 +151,7 @@ public class Dao {
 
 Programa la solicitud para ser ejecutada en segundo plano. Ideal para aplicaciones android. 
 Envía de manera asíncrona la petición y notifica a tu aplicación con un callback cuando una respuesta regresa.
-```
+```java
 ...
 Dao dao = new Dao();
     
