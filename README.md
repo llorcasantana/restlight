@@ -94,7 +94,7 @@ String run() throws Exception {
 
 En tu **build.gradle** necesitarás agregar las dependencias para **GSON**:
 
-```
+```groovy
 dependencies {
   ...
   compile 'com.google.code.gson:gson:2.4'
