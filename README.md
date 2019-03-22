@@ -143,8 +143,7 @@ public class Dao {
     request.setUrl("https://kylewbanks.com/rest/posts.json");
     request.setMethod("GET");
     
-    Restlight restlight = Restlight.get();
-    return restlight.newCall(request);
+    return Restlight.get().newCall(request);
   }
 }
 ```
