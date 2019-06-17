@@ -38,7 +38,8 @@ public class HttpUrlStack implements HttpStack {
    * @throws java.io.IOException
    */
   public HttpURLConnection open(Request request) throws IOException {  
-    HttpURLConnection conn = open(new URL(request.getUrl()));
+    URL src = new URL(request.getUrl().toString(request.getCharset()));
+    HttpURLConnection conn = open(src);
     conn.setConnectTimeout(request.getTimeoutMs());
     conn.setReadTimeout(request.getTimeoutMs());
     conn.setUseCaches(Boolean.FALSE);

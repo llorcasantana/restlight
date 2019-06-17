@@ -10,8 +10,7 @@ public class Delete {
   HttpUrlStack stack = new HttpUrlStack();
 
   String run() throws Exception {
-    HttpUrl url = new HttpUrl()
-            .setUrl("http://127.0.0.1/test.php")
+    HttpUrl url = new HttpUrl("http://127.0.0.1/test.php")
             .addQueryParameter("id", 101010);
 
     Request request = new Request();

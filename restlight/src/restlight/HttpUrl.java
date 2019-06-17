@@ -8,12 +8,12 @@ import java.util.List;
 
 public class HttpUrl {
   final List<String> namesAndValues = new ArrayList<String>();
-  String url;
+  final String url;
 
-  public HttpUrl setUrl(String url) {
+  public HttpUrl(String url) {
     this.url = url;
-    return this;
   }
+  
   public String getUrl() {
     return url;
   }
@@ -46,15 +46,20 @@ public class HttpUrl {
     }
     return sb.toString();
   }
-
+  
   public String toString(Charset charset) {
+    if (size() == 0) {
+      return url;
+    }
     try {
       String encodedParams = encodedUrlParams(charset);
-      if (encodedParams != null && encodedParams.length() > 0) {
-        return new StringBuilder(url.length() + 1 + encodedParams.length())
+      int len = encodedParams.length();
+      if (len > 0) {
+        return new StringBuilder(url.length() + 1 + len)
               .append(url)
               .append(url.contains("?") ? '&' : '?')
-              .append(encodedParams).toString();
+              .append(encodedParams)
+              .toString();
       }
     } catch(IOException ignore) {
       // empty

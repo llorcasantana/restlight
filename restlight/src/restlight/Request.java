@@ -13,7 +13,7 @@ public class Request {
   public static final String DEFAULT_METHOD = "GET";
   
   /** Url de nuestra request. */
-  String url;
+  HttpUrl url;
   
   /** Metodo de la request: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE. */
   String method = DEFAULT_METHOD;
@@ -24,14 +24,14 @@ public class Request {
   /** Parametros de nuestra request. */
   RequestBody body;
   
+  /** Etiqueta para identificar la request. */ 
+  Object tag = Request.class;
+  
   /** Tiempo limite de espera. */
   int timeoutMs = DEFAULT_TIMEOUT;
   
   /** Codificacion. */
   Charset charset = DEFAULT_ENCODING;
-  
-  /** Etiqueta para identificar la request. */ 
-  Object tag = Request.class;
   
   /** Valida si la request fue cancelada. */
   boolean isCanceled;
@@ -54,14 +54,14 @@ public class Request {
     }
   }
 
-  public String getUrl() {
+  public HttpUrl getUrl() {
     return url;
   }
   public void setUrl(String url) {
-    this.url = url;
+    setUrl(new HttpUrl(url));
   }
   public void setUrl(HttpUrl url) {
-    setUrl(url.toString(getCharset()));
+    this.url = url;
   }
    
   public String getMethod() {
