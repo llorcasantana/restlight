@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import restlight.Request;
-import restlight.RequestQueue;
+import restlight.Restlight;;
 
 /**
  * Helper that handles loading and caching images from remote URLs.
@@ -40,7 +40,7 @@ import restlight.RequestQueue;
  */
 public class ImageLoader {
     /** RequestQueue for dispatching ImageRequests onto. */
-    private final RequestQueue mRequestQueue;
+    private final Restlight mRequestQueue;
 
     /** Amount of time to wait after first response arrives before delivering all responses. */
     private int mBatchResponseDelayMs = 100;
@@ -70,7 +70,7 @@ public class ImageLoader {
      * @param queue The RequestQueue to use for making image requests.
      * @param imageCache The cache to use as an L1 cache.
      */
-    public ImageLoader(RequestQueue queue, ImageCache imageCache) {
+    public ImageLoader(Restlight queue, ImageCache imageCache) {
         mRequestQueue = queue;
         mCache = imageCache;
     }
@@ -232,7 +232,7 @@ public class ImageLoader {
         Request.Parse<Bitmap> newRequest = makeImageRequest(requestUrl, maxWidth, maxHeight, scaleType,
                 cacheKey);
 
-        mRequestQueue.add(newRequest);
+        mRequestQueue.enqueue(newRequest);
         mInFlightRequests.put(cacheKey,
                 new BatchedImageRequest(newRequest, imageContainer));
         return imageContainer;

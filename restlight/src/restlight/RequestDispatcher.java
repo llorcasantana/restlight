@@ -5,16 +5,16 @@ package restlight;
 public class RequestDispatcher extends Thread {
 
   /** Cola de peticiones al servidor. */
-  private final RequestQueue queue;
+  private final Restlight restlight;
   
   /** Es usado para decir que el hilo a muerto. */
   private volatile boolean quit = false;
 
   /**
-   * @param queue cola de peticiones.
+   * @param restlight cola de peticiones.
    */
-  public RequestDispatcher(RequestQueue queue) {
-    this.queue = queue;
+  public RequestDispatcher(Restlight restlight) {
+    this.restlight = restlight;
     setPriority(MIN_PRIORITY);
   }
 
@@ -37,7 +37,7 @@ public class RequestDispatcher extends Thread {
       Request.Parse<?> request;
       try {
         // Toma y quita la peticion de la cola.
-        request = queue.networkQueue().take();
+        request = restlight.networkQueue().take();
       } catch (InterruptedException e) {
         // El hilo pudo haber sido interrumpido.
         if (quit) return;
@@ -49,7 +49,7 @@ public class RequestDispatcher extends Thread {
         if (request.isCanceled()) continue;
 
         // Procesa la request.
-        ResponseBody responseBody = queue.stack().execute(request);
+        ResponseBody responseBody = restlight.stack().execute(request);
         
         // Si la petición ya estaba cancelada, no funciona la petición de la red.
         if (request.isCanceled()) {
@@ -71,7 +71,7 @@ public class RequestDispatcher extends Thread {
    */
   @SuppressWarnings("rawtypes")
   public void onResponse(final Callback callback, final Object response) {
-    queue.executorDelivery().execute(new Runnable() {  
+    restlight.executorDelivery().execute(new Runnable() {  
       @SuppressWarnings("unchecked")
       @Override
       public void run() {
@@ -88,7 +88,7 @@ public class RequestDispatcher extends Thread {
    * Metodo que se encarga de liverar el error obtenido de la conexión.
    */
   public void onFailure(final Callback<?> callback, final Exception error) {
-    queue.executorDelivery().execute(new Runnable() {
+    restlight.executorDelivery().execute(new Runnable() {
       @Override public void run() {
         callback.onFailure(error);
       }

@@ -1,62 +1,135 @@
 package restlight;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * Clase que controlara la cola de peticiones al servidor.
+ *
+ * @author Jesus Baez
+ */
 public class Restlight implements HttpStack {
-
+  /** Numero de despachadores que atenderan las peticiones de la red. */
+  static final int DEFAULT_NETWORK_THREAD_POOL_SIZE = 4;
+  
 // TODO: Varibles...
   private static Restlight instance;
 
-  /** Procesara las peticiones a internet. */
-  private HttpStack httpStack;
+  /** Cola de peticiones que se procesaran a la red. */
+  private BlockingQueue<Request.Parse<?>> networkQueue;
   
-  /** Cola de peticiones al servidor. */
-  private RequestQueue requestQueue;
+  /** Procesara las peticiones a internet. */
+  private final HttpStack httpStack;
+  
+  /** Hilo que atendera la cola. */
+  private final Thread[] dispatchers;
+
+  /** Puente que comunica las tareas con el hilo principal. */
+  private Executor executorDelivery;
  
 // TODO: Constructor...
 
-  private Restlight() {
+  public Restlight(HttpStack stack, int threadPoolSize) {
+    dispatchers = new Thread[threadPoolSize];
+    executorDelivery = Platform.get();
+    httpStack = stack;
+  }
+  
+  private Restlight(HttpStack stack) {
+    this(stack, DEFAULT_NETWORK_THREAD_POOL_SIZE);
   }
   
   public static Restlight get() {
-    if (instance == null) instance = new Restlight();
+    if (instance == null) {
+      instance = new Restlight(new HttpUrlStack());
+    }
     return instance;
   }
 
 // TODO: Funciones...
-  
-  public HttpStack getStack() {
-    if (httpStack == null) {
-      httpStack = new HttpUrlStack();
+    
+  /**
+   * @return La cola de despacho.
+   */
+  public BlockingQueue<Request.Parse<?>> networkQueue() {
+    if (networkQueue == null) {
+      networkQueue = new LinkedBlockingQueue<Request.Parse<?>>();
+      start();
     }
+    return networkQueue;
+  }  
+  
+  public HttpStack stack() {
     return httpStack;
   }
-  
-  public void setStack(HttpStack stack) {
-    httpStack = stack;
-  }
-  
-  public Executor getExecutorDelivery() {
-    return getQueue().executorDelivery();
+
+  public Executor executorDelivery() {
+    return executorDelivery;
   }
   
   public void setExecutorDelivery(Executor executor) {
-    getQueue().setExecutorDelivery(executor);
+    executorDelivery = executor;
   }
   
-  public RequestQueue getQueue() {
-    if (requestQueue == null) {
-      requestQueue = new RequestQueue(this);
-      requestQueue.start();
+  /**
+   * Inicia los hilos que atendera la cola de peticiones.
+   */
+  public void start() {
+    stop();
+    for (int i = 0; i < dispatchers.length; i++) {
+      dispatchers[i] = new RequestDispatcher(this);
+      dispatchers[i].start();
     }
-    return requestQueue;
+  }
+
+  /**
+   * Obliga a detener todos los hilos.
+   */
+  public void stop() {
+    for (int i = 0; i < dispatchers.length; i++) {
+      if (dispatchers[i] != null) {
+        dispatchers[i].interrupt();
+        dispatchers[i] = null;
+      }
+    }
+  }
+ 
+  /**
+   * Elimina una Peticion a la cola de despacho.
+   *
+   * @param request La peticion a remover
+   * @return La peticion removida
+   */
+  public <T> Request.Parse<T> remove(Request.Parse<T> request) {
+    networkQueue.remove(request);
+    return request;
   }
   
-  public void setQueue(RequestQueue queue, boolean quit) {
-    if (requestQueue != null && quit) requestQueue.stop();
-    requestQueue = queue;
+  /**
+   * Cancela todas las peticiones en esta cola.
+   */
+  public void cancelAll() {
+    synchronized (networkQueue) {
+      for (Request.Parse<?> request : networkQueue) {
+        request.cancel();
+      }
+    }
   }
+  
+  /**
+   * Cancela todas las peticiones de esta cola con la etiqueta dada.
+   */
+  public void cancelAll(final Object tag) {
+    synchronized (networkQueue) {
+      for (Request.Parse<?> request : networkQueue) {
+        if (request.getTag() == tag) {
+          request.cancel();
+        }
+      }
+    }
+  } 
   
   /**
    * Envía de manera asíncrona la petición y notifica a tu aplicación con un
@@ -66,8 +139,9 @@ public class Restlight implements HttpStack {
    * 
    * @param request petición a realizar
    */
-  public void enqueue(Request.Parse<?> request) {
-    getQueue().add(request);
+  public <T> Request.Parse<T> enqueue(Request.Parse<T> request) {
+    networkQueue().add(request);
+    return request;
   }
   
   /**
@@ -81,7 +155,7 @@ public class Restlight implements HttpStack {
    * servidor
    */
   public ResponseBody execute(Request request) throws IOException {
-    return getStack().execute(request);
+    return stack().execute(request);
   }
 
   public <V> V execute(Request.Parse<V> parse) throws Exception {
