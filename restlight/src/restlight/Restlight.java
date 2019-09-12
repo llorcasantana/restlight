@@ -14,23 +14,20 @@ public class Restlight implements HttpStack {
   /** Numero de despachadores que atenderan las peticiones de la red. */
   static final int DEFAULT_NETWORK_THREAD_POOL_SIZE = 4;
   
-// TODO: Varibles...
   private static Restlight instance;
-
-  /** Cola de peticiones que se procesaran a la red. */
-  private BlockingQueue<Request.Parse<?>> networkQueue;
   
   /** Procesara las peticiones a internet. */
-  private final HttpStack httpStack;
+  protected final HttpStack httpStack;
   
   /** Hilo que atendera la cola. */
-  private final Thread[] dispatchers;
+  protected final Thread[] dispatchers;
+  
+  /** Cola de peticiones que se procesaran a la red. */
+  private BlockingQueue<Request.Parse<?>> networkQueue;
 
   /** Puente que comunica las tareas con el hilo principal. */
   private Executor executorDelivery;
  
-// TODO: Constructor...
-
   public Restlight(HttpStack stack, int threadPoolSize) {
     dispatchers = new Thread[threadPoolSize];
     executorDelivery = Platform.get();
@@ -48,8 +45,6 @@ public class Restlight implements HttpStack {
     return instance;
   }
 
-// TODO: Funciones...
-    
   /**
    * @return La cola de despacho.
    */
