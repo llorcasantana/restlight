@@ -35,7 +35,7 @@ public class Request {
   
   /** Valida si la request fue cancelada. */
   boolean isCanceled;
-
+  
   /**
    * @return true si se cancelo la peticion.
    */
@@ -110,8 +110,19 @@ public class Request {
   public void setTag(Object tag) {
     this.tag = tag;
   }
+
   
+  public static boolean requiresRequestBody(String method) {
+    return method.equals("POST") || method.equals("PUT");
+  }
+
+  @Override public String toString() {
+    return "Request{" + "url=" + url + ", method=" + method + ", headers=" 
+            + headers + ", tag=" + tag + ", timeoutMs=" + timeoutMs 
+            + ", charset=" + charset + ", isCanceled=" + isCanceled + '}';
+  }
   
+
   public static abstract class Parse<T> extends Request implements Callback<T> {
     /** Intefaz que escuchara la respuesta. */
     private Callback<T> callback;

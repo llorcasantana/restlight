@@ -57,7 +57,7 @@ public class RequestDispatcher extends Thread {
           continue;
         }
          
-        this.onResponse(request, responseBody.result(request));
+        this.onResponse(request, responseBody.parse(request));
         
       } catch (Exception e) {
         // TODO: handle exception

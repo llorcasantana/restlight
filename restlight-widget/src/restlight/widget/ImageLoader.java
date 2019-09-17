@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import restlight.Request;
-import restlight.Restlight;;
+import restlight.Restlight;
 
 /**
  * Helper that handles loading and caching images from remote URLs.

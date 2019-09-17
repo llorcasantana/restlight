@@ -1,7 +1,6 @@
 package restlight;
 
 import java.io.BufferedOutputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -38,7 +37,7 @@ public class HttpUrlStack implements HttpStack {
    * @throws java.io.IOException
    */
   public HttpURLConnection open(Request request) throws IOException {  
-    URL src = new URL(request.getUrl().toString(request.getCharset()));
+    URL src = request.getUrl().toUrl(request.getCharset());
     HttpURLConnection conn = open(src);
     conn.setConnectTimeout(request.getTimeoutMs());
     conn.setReadTimeout(request.getTimeoutMs());
@@ -78,7 +77,7 @@ public class HttpUrlStack implements HttpStack {
     String method = request.getMethod();
     conn.setRequestMethod(method);
 
-    if (method.equals("POST") || method.equals("PUT")) {
+    if (Request.requiresRequestBody(method)) {
       // Write request to server.
       writeTo(conn, request);
     }
@@ -116,7 +115,7 @@ public class HttpUrlStack implements HttpStack {
     }
   }
   
-  public ResponseBody newResponse(HttpURLConnection conn, Request request) 
+  public ResponseBody getResponse(HttpURLConnection conn, Request request) 
   throws IOException {
     int responseCode = conn.getResponseCode();
     if (responseCode == -1) {
@@ -125,26 +124,25 @@ public class HttpUrlStack implements HttpStack {
       throw new IOException("Could not retrieve response code from HttpUrlConnection.");
     }
     
-    ResponseBody response = new ResponseBody();
+    ResponseBody response = body(conn);
     response.code = responseCode;
     response.headers = Headers.of(conn.getHeaderFields());
     response.contentLength = conn.getContentLength();
     response.contentEncoding = conn.getContentEncoding();
     response.contentType = conn.getContentType();
-    response.inputStream = inputStream(conn);
     return response;
   }
   
-  static InputStream inputStream(final HttpURLConnection hurlc) {
+  static ResponseBody body(final HttpURLConnection hurlc) {
     InputStream inputStream;
     try {
       inputStream = hurlc.getInputStream();
     } catch(IOException e) {
       inputStream = hurlc.getErrorStream();
     }
-    return new FilterInputStream(inputStream) {
+    return new ResponseBody(inputStream) {
       @Override public void close() {
-        IOUtils.closeQuietly(in);
+        super.close();
         hurlc.disconnect();
       }
     };
@@ -163,16 +161,16 @@ public class HttpUrlStack implements HttpStack {
     HttpURLConnection conn = null;
     try {
       conn = open(request);
-      
       if (request.isCanceled()) throw new IOException("request is cancel");
       
       writeHeaders(conn, request);
       writeBody(conn, request);
-      return newResponse(conn, request);
+      return getResponse(conn, request);
      
     } catch (IOException e) {
       if (conn != null) conn.disconnect();
       throw e;
     }
   }
+  
 }

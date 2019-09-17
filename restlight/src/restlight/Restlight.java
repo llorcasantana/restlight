@@ -5,25 +5,20 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * Clase que controlara la cola de peticiones al servidor.
- *
- * @author Jesus Baez
- */
 public class Restlight implements HttpStack {
   /** Numero de despachadores que atenderan las peticiones de la red. */
   static final int DEFAULT_NETWORK_THREAD_POOL_SIZE = 4;
   
   private static Restlight instance;
   
+  /** Cola de peticiones que se procesaran a la red. */
+  private BlockingQueue<Request.Parse<?>> networkQueue;
+  
   /** Procesara las peticiones a internet. */
   protected final HttpStack httpStack;
   
   /** Hilo que atendera la cola. */
   protected final Thread[] dispatchers;
-  
-  /** Cola de peticiones que se procesaran a la red. */
-  private BlockingQueue<Request.Parse<?>> networkQueue;
 
   /** Puente que comunica las tareas con el hilo principal. */
   private Executor executorDelivery;
@@ -33,7 +28,7 @@ public class Restlight implements HttpStack {
     executorDelivery = Platform.get();
     httpStack = stack;
   }
-  
+ 
   private Restlight(HttpStack stack) {
     this(stack, DEFAULT_NETWORK_THREAD_POOL_SIZE);
   }
@@ -44,14 +39,14 @@ public class Restlight implements HttpStack {
     }
     return instance;
   }
-
+  
   /**
    * @return La cola de despacho.
    */
   public BlockingQueue<Request.Parse<?>> networkQueue() {
     if (networkQueue == null) {
-      networkQueue = new LinkedBlockingQueue<Request.Parse<?>>();
-      start();
+       networkQueue = new LinkedBlockingQueue<Request.Parse<?>>();
+       start();
     }
     return networkQueue;
   }  
@@ -90,7 +85,20 @@ public class Restlight implements HttpStack {
       }
     }
   }
- 
+   
+  /**
+   * Envía de manera asíncrona la petición y notifica a tu aplicación con un
+   * callback cuando una respuesta regresa. Ya que esta petición es asíncrona,
+   * la ejecución se maneja en un hilo de fondo para que el hilo de la UI
+   * principal no sea bloqueada o interfiera con esta.
+   * 
+   * @param request petición a realizar
+   */
+  public <T> Request.Parse<T> enqueue(Request.Parse<T> request) {
+    networkQueue().add(request);
+    return request;
+  }
+  
   /**
    * Elimina una Peticion a la cola de despacho.
    *
@@ -105,39 +113,22 @@ public class Restlight implements HttpStack {
   /**
    * Cancela todas las peticiones en esta cola.
    */
-  public void cancelAll() {
-    synchronized (networkQueue) {
-      for (Request.Parse<?> request : networkQueue) {
-        request.cancel();
-      }
+  public synchronized void cancelAll() {
+    for (Request.Parse<?> request : networkQueue()) {
+      request.cancel();
     }
   }
   
   /**
    * Cancela todas las peticiones de esta cola con la etiqueta dada.
    */
-  public void cancelAll(final Object tag) {
-    synchronized (networkQueue) {
-      for (Request.Parse<?> request : networkQueue) {
-        if (request.getTag() == tag) {
-          request.cancel();
-        }
+  public synchronized void cancelAll(final Object tag) {
+    for (Request.Parse<?> request : networkQueue()) {
+      if (request.getTag() == tag) {
+        request.cancel();
       }
     }
   } 
-  
-  /**
-   * Envía de manera asíncrona la petición y notifica a tu aplicación con un
-   * callback cuando una respuesta regresa. Ya que esta petición es asíncrona,
-   * la ejecución se maneja en un hilo de fondo para que el hilo de la UI
-   * principal no sea bloqueada o interfiera con esta.
-   * 
-   * @param request petición a realizar
-   */
-  public <T> Request.Parse<T> enqueue(Request.Parse<T> request) {
-    networkQueue().add(request);
-    return request;
-  }
   
   /**
    * Envíe sincrónicamente la solicitud y devuelva su respuesta.
@@ -153,13 +144,13 @@ public class Restlight implements HttpStack {
     return stack().execute(request);
   }
 
-  public <V> V execute(Request.Parse<V> parse) throws Exception {
-    return execute((Request)parse).result(parse);
+  public <V> V executeAndParse(Request.Parse<V> parse) throws Exception {
+    return execute(parse).parse(parse);
   }
   
   public <V> V execute(Request request, Request.Parse<V> parse) throws Exception {
     parse.setRequest(request);
-    return execute(parse);
+    return executeAndParse(parse);
   }
   
   /**
@@ -177,7 +168,7 @@ public class Restlight implements HttpStack {
         enqueue(request);
       }
       @Override public V execute() throws Exception {
-        return Restlight.this.execute(request);
+        return executeAndParse(request);
       }
       @Override public Request.Parse<V> request() {
         return request;

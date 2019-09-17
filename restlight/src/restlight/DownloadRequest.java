@@ -20,7 +20,7 @@ public class DownloadRequest extends Request.Parse<File> {
     BufferedOutputStream bos = null;
     try {
       bos = new BufferedOutputStream(new FileOutputStream(file));
-      IOUtils.copy(response.inputStream, bos);
+      response.writeTo(bos);
       return file;
     } finally {
       IOUtils.closeQuietly(bos);

@@ -1,6 +1,8 @@
 package restlight;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -47,10 +49,17 @@ public class HttpUrl {
     return sb.toString();
   }
   
-  public String toString(Charset charset) {
-    if (size() == 0) {
-      return url;
+  public URL toUrl(Charset charset) {
+    try {
+      return new URL(toString(charset));
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e.getMessage(), e);
     }
+  }
+  
+  public String toString(Charset charset) {
+    if (size() == 0) return url;
+    
     try {
       String encodedParams = encodedUrlParams(charset);
       int len = encodedParams.length();
